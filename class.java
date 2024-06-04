@@ -6,7 +6,6 @@ import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 
 class Main{
 
@@ -31,11 +30,11 @@ class Main{
         headerPanel.add(minimizeButton);
         headerPanel.add(closeButton);
 
-        frame = new Frame();
+        frame = new Frame(null);
         frame.add(headerPanel);
     }
 
-    public class MouseListener extends MouseAdapter implements MouseMotionListener{
+    public class MouseListener extends MouseAdapter{
         private Point mouse_rel_comp_coords = null;
         public void mouseReleased(MouseEvent e){
             mouse_rel_comp_coords = null;
@@ -51,7 +50,7 @@ class Main{
 }
 
 class Frame extends JFrame{
-    Frame(){
+    Frame(LayoutManager layout_style){
         this.setResizable(false);
         this.setSize(825,825);
         this.setUndecorated(true);
@@ -59,6 +58,7 @@ class Frame extends JFrame{
         this.setLayout(null);
         this.setLocationRelativeTo(null);
         this.getContentPane().setBackground(Color.BLACK);
+        this.setLayout(layout_style);
     }
 }
 
