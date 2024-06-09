@@ -1,3 +1,9 @@
+// to do: make the four panel on for loop and inside is nested loop for the playlist panels that contains the album/singer picture, title/name, author...
+
+    //pps four outer panel is already done, only needs to place the for loop for label and for loop for inside panels...
+
+// make the content panel and its content adjusts when the sidebar panel has been expanded...
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -25,28 +31,39 @@ class SuperMain{
     SuperMain(){
 
     final int arc = 20;
-    // format2 are follows: posX, posY, width, height, JScrollPane width, JScrollPane height.
-    Integer[] side_bar_panel = {10, 60, 80, 650, 90, 50};
-    // format are follows: height, width, button wh, button ht.
-    Integer[] sub_panel_sizes= {882, 50, 50, 50};
-    // array list are at follow: posX, posY, width, height, gridLayout_row, gridLayout_column, grid_hgap, grid_vgap
-    Integer[] sub_top_panel = {1, 1, 694, 130, 2, 4, 5, 5};
-    // as follows: posX, posY, width, height
-    Integer[] first_panel = {0, 160, 694, 180};
-    // as follows: posX, posY, width, height
-    Integer[] second_panel = {0, 370, 694, 180};
-    // as follows: posX, posY, width, height
-    Integer[] third_panel = {0, 540, 694, 180};
+    // format as follows: posX, posY, width, height
+    Integer[] header_panel = {0, -5, 825, 70};
+        //format as follows: posX, posY, width, height
+        // Integer[] searchbar_value = {155, 20, 400, 40};
+        //format as follows: posX, posY, width, height
+        Integer[] minimize_value = {650, 5, 90, 65};
+        //format as follows: posX, posY, width, height
+        Integer[] close_value = {735, 5, 90, 65};
+
+    // format as follows: posX, posY, width, height,JScrollPane posX, JScrollPane posY JScrollPane width, JScrollPane height, arcX, arcY.
+    Integer[] side_bar_panel = {10, 80, 80, 650, 5, 5, 70, 630, 20, 20};
+    // format as follows: posX, posY, width, height, JScrollPane width, JScrollPane height, JScrollPane posX, JScrollPane posY, arcX, arcY
+    Integer[] content_panel = {100, 80, 715, 650, 10, 10, 695, 630, 20, 20};
+        //format as follows: width, and height
+        Integer[] main_content_holder = {695,1000};
+        // format as follows: height, width, button wh, button ht.
+        Integer[] sub_panel_sizes= {882, 50, 50, 50};
+        // array list as follows: posX, posY, width, height, gridLayout_row, gridLayout_column, grid_hgap, grid_vgap
+        Integer[] sub_top_panel = {1, 1, 694, 130, 2, 4, 5, 5};
     
 
-    Panel headerPanel = new Panel(Color.GREEN, 0, -5, 825, 50, null);
-    headerPanel.setOpaque(true);
+    Panel headerPanel = new Panel(Color.BLUE, header_panel[0], header_panel[1], header_panel[2], header_panel[3], null);
     MouseListener mouse = new MouseListener(); 
+    headerPanel.setOpaque(false);
     headerPanel.addMouseListener(mouse);
     headerPanel.addMouseMotionListener(mouse);
     frame.add(headerPanel);
 
-        Button minimizeButton = new Button(650, 0, 90, 50);
+        // Panel searchBarPanel = new Panel(Color.WHITE, searchbar_value[0], searchbar_value[1], searchbar_value[2], searchbar_value[3], null);
+        // searchBarPanel.setOpaque(false);
+        // headerPanel.add(searchBarPanel);
+
+        Button minimizeButton = new Button(minimize_value[0], minimize_value[1], minimize_value[2], minimize_value[3]);
         minimizeButton.setOpaque(false);
         minimizeButton.setContentAreaFilled(false);
         minimizeButton.setBorderPainted(false);
@@ -64,7 +81,7 @@ class SuperMain{
         });
         headerPanel.add(minimizeButton);
 
-        Button closeButton = new Button(735, 0, 90, 50);
+        Button closeButton = new Button(close_value[0], close_value[1], close_value[2], close_value[3]);
         closeButton.setText("Close");
         closeButton.setOpaque(false);
         closeButton.setContentAreaFilled(false);
@@ -83,11 +100,11 @@ class SuperMain{
         });
         headerPanel.add(closeButton);
 
-    Panel sidebarPanel = new Panel(Color.BLUE, side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
+    Panel sidebarPanel = new Panel(Color.DARK_GRAY, side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
-            Dimension arcs = new Dimension(arc, arc);
+            Dimension arcs = new Dimension(side_bar_panel[8], side_bar_panel[9]);
             int width = getWidth();
             int height = getHeight();
             Graphics2D g2d = (Graphics2D)g;
@@ -104,16 +121,11 @@ class SuperMain{
     frame.add(sidebarPanel);
 
             //Panel that holds the scrollable area in the sidebar.
-            Panel subPanel = new Panel(null, sub_panel_sizes[0], sub_panel_sizes[1], new FlowLayout(FlowLayout.CENTER));
-            subPanel.setBackground(Color.BLUE);
+            Panel subPanel = new Panel(Color.DARK_GRAY, sub_panel_sizes[0], sub_panel_sizes[1], new FlowLayout(FlowLayout.CENTER));
             subPanel.setOpaque(true);
 
-                Button libraryButton = new Button(sub_panel_sizes[2], sub_panel_sizes[3]);
-                libraryButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                subPanel.add(libraryButton);
-
-                Button[] object = new Button[15];
-                for(int i = 0; i < 15; i++){
+                Button[] object = new Button[16];
+                for(int i = 0; i < 16; i++){
                     object[i] = new Button(sub_panel_sizes[2], sub_panel_sizes[3]);
                     object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subPanel.add(object[i]);
@@ -121,7 +133,7 @@ class SuperMain{
 
             JScrollPane scroll = new JScrollPane(subPanel);
             scroll.getVerticalScrollBar().setUnitIncrement(5);
-            scroll.setBounds(5, 5, 70, 630);
+            scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
             scroll.setBorder(BorderFactory.createEmptyBorder());
             scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -129,11 +141,11 @@ class SuperMain{
         
 
         //Color, posX, posY, width, height
-    Panel contentPanel = new Panel(Color.DARK_GRAY, 100, 60, 715, 650, null){
+    Panel contentPanel = new Panel(Color.DARK_GRAY, content_panel[0], content_panel[1], content_panel[2], content_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
-            Dimension arcs = new Dimension(arc, arc);
+            Dimension arcs = new Dimension(content_panel[8], content_panel[9]);
             int width = getWidth();
             int height = getHeight();
             Graphics2D g2d = (Graphics2D)g;
@@ -154,15 +166,14 @@ class SuperMain{
     JPanel mainContentHolder = new JPanel();
     mainContentHolder.setLayout(null);
     mainContentHolder.setBackground(Color.DARK_GRAY);
-    mainContentHolder.setPreferredSize(new Dimension(695, 1300));
+    mainContentHolder.setPreferredSize(new Dimension(main_content_holder[0], main_content_holder[1]));
 
             Panel subTopPanel = new Panel(null, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
-
-                //as follows: height, width
+            // grid layout set on a 2x4 rowXcolumn with a set size
                 Color[] color_array = {Color.BLACK, Color.RED, Color.GREEN, Color.WHITE, Color.CYAN, Color.MAGENTA, Color.PINK, Color.YELLOW};
                 Panel[] playlist = new Panel[8];
 
-                //no need to put height and width to child component of a gridlayout because it child component adapts its container size.
+                //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat. parent container: supTopPanel.
 
                 for (int i = 0; i < 8; i++){
                     playlist[i] = new Panel(color_array[i], 0, 0, null){
@@ -187,89 +198,61 @@ class SuperMain{
                 }
                 mainContentHolder.add(subTopPanel);
 
-            Panel firstPanel = new Panel(null, first_panel[0], first_panel[1], first_panel[2], first_panel[3], null);
-            firstPanel.setOpaque(false);
-            mainContentHolder.add(firstPanel);
+    JScrollPane mainContentScroll = new JScrollPane(mainContentHolder);
+    mainContentScroll.getVerticalScrollBar().setUnitIncrement(8);
+    mainContentScroll.setBorder(BorderFactory.createEmptyBorder());
+    mainContentScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+    mainContentScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    mainContentScroll.setBounds(content_panel[4], content_panel[5], content_panel[6], content_panel[7]);
+    contentPanel.add(mainContentScroll);
 
-                Label panelTitles = new Label("Recently Played", "Myanmar Text", Color.WHITE, Font.BOLD, 0, 2, 694, 30, 24);
-                firstPanel.add(panelTitles);
+    //put nested album/singer panels on a gridLayout with a row of 0 and column of sumn     
 
-                Panel playlistPanel = new Panel(null, 0, 33, 694, 147, new FlowLayout(FlowLayout.CENTER));
-                firstPanel.add(playlistPanel);
+    // as follows: panel#, mainTitle#, 
 
-                    Panel[] albumList = new Panel[5];
+    Panel[] panelObject = new Panel[4];
+    String[] label_text = {"Recently Played", "Made for you", "Your Favorite Artist", "Jump Back In"};
+    Label[] mainTitle = new Label[4];
+    Panel[] listHolder = new Panel[4];
+    Panel[] picHolder = new Panel[4];
 
-                    for (int i = 0; i < 5; i++){
-                        albumList[i] = new Panel(Color.RED, 132, 132, null){
-                            @Override
-                            protected void paintComponent(Graphics g){
-                                super.paintComponent(g);
-                                Dimension arcs = new Dimension(arc, arc);
-                                int width = getWidth();
-                                int height = getHeight();
-                                Graphics2D g2d = (Graphics2D)g;
-                                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                                //Draws the rounded opaque panel with borders
-                                g2d.setColor(getBackground());
-                                g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                                g2d.setColor(getForeground());
-                                g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            }
-                        };
-                        albumList[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        playlistPanel.add(albumList[i]);
-                    }
+    for (int i = 0; i < panelObject.length; i++){
+        panelObject[i] = new Panel(Color.RED, 0, (30 + 130) + (i * 210), 694, 180, null);
+        //posY 30 is the spacing between four panels, 130 is the height of upper outer panel of the content, 210 is the total height of the panel combined with pre existing (or not) spacing... im so proud of myself XD      
+        // panelObject[i].setOpaque(true);
+        mainContentHolder.add(panelObject[i]);
 
-                JScrollPane mainContentScroll = new JScrollPane(mainContentHolder);
-                mainContentScroll.getVerticalScrollBar().setUnitIncrement(8);
-                mainContentScroll.setBorder(BorderFactory.createEmptyBorder());
-                mainContentScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-                mainContentScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                mainContentScroll.setBounds(10, 10, 695, 630);
-                contentPanel.add(mainContentScroll);
+        mainTitle[i] = new Label(label_text[i], "Myanmar Text", Color.WHITE, Font.BOLD, 10, 10, 500, 30, 24);
+        panelObject[i].add(mainTitle[i]);
 
-            Panel secondPanel = new Panel(null, second_panel[0], second_panel[1], second_panel[2], second_panel[3], null);
-            mainContentHolder.add(secondPanel);
+        listHolder[i] = new Panel(Color.BLUE, 0, 40, 694, 140, new GridLayout(0, 4, 10, 0));
+        // listHolder[i].setOpaque(true);
+        panelObject[i].add(listHolder[i]);
 
-                Label secondPanelTitle = new Label("Made for you", "Myanmar Text", Color.WHITE, Font.BOLD, 0, 5, 684, 30, 24);
-                secondPanel.add(secondPanelTitle);
-
-                Panel secondPlaylistPanel = new Panel(null, 0, 35, 694, 145, new FlowLayout());
-                secondPanel.add(secondPlaylistPanel);
-
-                Panel[] madeList = new Panel[5];
-                
-                for (int i = 0; i < 5; i++){
-                    madeList[i] = new Panel(Color.RED, 132, 132, null){
-                        @Override
-                        protected void paintComponent(Graphics g){
-                            super.paintComponent(g);
-                            Dimension arcs = new Dimension(arc, arc);
-                            int width = getWidth();
-                            int height = getHeight();
-                            Graphics2D g2d = (Graphics2D)g;
-                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                            
-                            //Draws the rounded opaque panel with borders
-                            g2d.setColor(getBackground());
-                            g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            g2d.setColor(getForeground());
-                            g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                        }
-                    };
-                    madeList[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    secondPlaylistPanel.add(madeList[i]);
+        for (int j = 0; j < picHolder.length; j++){
+            picHolder[i] = new Panel(Color.ORANGE, 100, 100, null){
+                @Override
+                protected void paintComponent(Graphics g){
+                    super.paintComponent(g);
+                    Dimension arcs = new Dimension(20, 20);
+                    int width = getWidth();
+                    int height = getHeight();
+                    Graphics2D g2d = (Graphics2D)g;
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    
+                    //Draws the rounded opaque panel with borders
+                    g2d.setColor(getBackground());
+                    g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                    g2d.setColor(getForeground());
+                    g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                 }
-
-            Panel thirdPanel = new Panel(Color.ORANGE, third_panel[0], third_panel[1], third_panel[2], third_panel[3], null);
-
-
-
-
-
+            };
+            // picHolder[i].setOpaque(true);
+            listHolder[i].add(picHolder[i]);
+        }
+    };
     frame.setVisible(true);
-    }
+}
 
     public class MouseListener extends MouseAdapter{
         private Point mouse_rel_comp_coords = null;
@@ -283,6 +266,10 @@ class SuperMain{
             Point currentPt = e.getLocationOnScreen();
             frame.setLocation(currentPt.x - mouse_rel_comp_coords.x, currentPt.y - mouse_rel_comp_coords.y);
         }
+    }
+
+    public static void libraryClicked(){
+        
     }
 
 }
