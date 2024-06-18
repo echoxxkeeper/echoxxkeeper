@@ -1,5 +1,3 @@
-// make the content panel and its content adjusts when the sidebar panel has been expanded...
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -7,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -23,16 +22,17 @@ import javax.swing.JScrollPane;
 
 class SuperMain implements ActionListener{
 
-    Data data = new Data();
+    static Data data = new Data();
     private Frame frame;
     private Panel sidebarPanel;
-    private JScrollPane scroll;
-    private Button[] object;
-    private Button libraryButton;
+        private Panel subPanel;
+        private Button libraryButton;
     private Panel contentPanel;
+        private JScrollPane scroll;
+        private Panel subTopPanel;
+    private Button[] object;
     private Panel[] listHolder;
-    Panel subTopPanel;
-    private Boolean is_toggled = false;
+    
 
     final int arc = 20;
     // format as follows: posX, posY, width, height
@@ -57,18 +57,18 @@ class SuperMain implements ActionListener{
         
     private Integer[] content_panel = {100, 80, 715, 650, 10, 10, 695, 630, 20, 20};
     //format as follows: width, and height
-        private Integer[] main_content_holder = {0, 1080};
+        private Integer[] main_content_holder = {0, 1480};
         // array list as follows: posX, posY, width, height, gridLayout_row, gridLayout_column, grid_hgap, grid_vgap
         private Integer[] sub_top_panel = {1, 1, 694, 130, 2, 4, 5, 5};
 
         // outer panel that holds the entire for loop, as follows: posX, width, height
-        private Integer[] panel_object = {0, 694, 180};
+        private Integer[] panel_object = {0, 694, 280};
             // inner title text, as follows: posX, posY, width, height, font size
             private Integer[] main_title = {1, 10, 500, 30, 24};
             // panel that holds the album/singer, as follows: posX, posY, width, height, rows, column, hgap, vgap.
-            private Integer[] list_holder = {1, 40, 694, 140, 0, 4, 10, 0};
+            private Integer[] list_holder = {1, 40, 694, 240, 0, 4, 10, 0};
             // the album/singer itself, as follows: width, height, arcWidth, arcHeight
-            private Integer[] pic_holder = {100, 100, 20, 20};
+            private Integer[] pic_holder = {100, 200, 20, 20};
 
     SuperMain(){
     
@@ -118,7 +118,7 @@ class SuperMain implements ActionListener{
         });
         headerPanel.add(closeButton);
 
-    sidebarPanel = new Panel(Color.DARK_GRAY, side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
+    sidebarPanel = new Panel(new Color(18, 18, 18), side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
@@ -131,19 +131,27 @@ class SuperMain implements ActionListener{
             //Draws the rounded opaque panel with borders
             g2d.setColor(getBackground());
             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-            g2d.setColor(getForeground());
-            g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+            // g2d.setColor(getForeground());
+            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
         }
 
     };
     frame.add(sidebarPanel);
 
             //Panel that holds the scrollable area in the sidebar.
-            Panel subPanel = new Panel(Color.BLACK, sub_panel_sizes[0], sub_panel_sizes[1], null);
+            subPanel = new Panel(new Color(18, 18, 18), sub_panel_sizes[0], sub_panel_sizes[1], null);
             subPanel.setOpaque(true);
-                libraryButton = new Button(library_button[0], library_button[1], library_button[2], library_button[3]);
+
+                libraryButton = new Button(library_button[0], library_button[1], library_button[2], library_button[3], data.getImageIcon(1).getImage(), 10, 10, library_button[2] -20, library_button[3] -20);
+                libraryButton.setContentAreaFilled(false);
+                libraryButton.setBackground(Color.DARK_GRAY);
+                libraryButton.setBorder(BorderFactory.createEmptyBorder());
+                libraryButton.setLayout(null);
                 libraryButton.addActionListener(this);
                 subPanel.add(libraryButton);
+
+                Label libraryText = new Label(data.getTitle(4), "Myanmar Text", new Color(255, 230, 230), Font.BOLD, 50, 15, 150, 30, 22);
+                libraryButton.add(libraryText);
 
                 object = new Button[15];
                 for(int i = 0; i < 15; i++){
@@ -162,7 +170,7 @@ class SuperMain implements ActionListener{
         
 
         //Color, posX, posY, width, height
-    contentPanel = new Panel(Color.DARK_GRAY, content_panel[0], content_panel[1], content_panel[2], content_panel[3], null){
+    contentPanel = new Panel(new Color(18, 18, 18), content_panel[0], content_panel[1], content_panel[2], content_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
@@ -175,8 +183,8 @@ class SuperMain implements ActionListener{
             //Draws the rounded opaque panel with borders
             g2d.setColor(getBackground());
             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-            g2d.setColor(getForeground());
-            g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+            // g2d.setColor(getForeground());
+            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
         }
     
     };
@@ -186,7 +194,7 @@ class SuperMain implements ActionListener{
     //holds the scrollable area for the whole content panel
     JPanel mainContentHolder = new JPanel();
     mainContentHolder.setLayout(null);
-    mainContentHolder.setBackground(Color.DARK_GRAY);
+    mainContentHolder.setBackground(new Color(18, 18, 18));
     mainContentHolder.setPreferredSize(new Dimension(main_content_holder[0], main_content_holder[1]));
 
             subTopPanel = new Panel(null, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
@@ -194,7 +202,7 @@ class SuperMain implements ActionListener{
                 Color[] color_array = {Color.BLACK, Color.RED, Color.GREEN, Color.WHITE, Color.CYAN, Color.MAGENTA, Color.PINK, Color.YELLOW};
                 Panel[] playlist = new Panel[8];
 
-                //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat. parent container: supTopPanel.
+                //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat parent container: supTopPanel.
 
                 for (int i = 0; i < 8; i++){
                     playlist[i] = new Panel(color_array[i], 0, 0, null){
@@ -210,8 +218,8 @@ class SuperMain implements ActionListener{
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            g2d.setColor(getForeground());
-                            g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                            // g2d.setColor(getForeground());
+                            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                         }
                     };
                     playlist[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -235,8 +243,8 @@ class SuperMain implements ActionListener{
     Panel[] picHolder = new Panel[4]; //album itself.
 
             for (int i = 0; i < panelObject.length; i++){
-                panelObject[i] = new Panel(Color.RED, panel_object[0], (60 + 130) + (i * 230), panel_object[1], panel_object[2], null);
-                //posY 30 is the spacing between (4) panels, 130 is the height of upper outer panel of the content, 210 is the total height of the panel combined with pre existing (or not) spacing... im so proud of myself XD      
+                panelObject[i] = new Panel(Color.RED, panel_object[0], (60 + 130) + (i * 330), panel_object[1], panel_object[2], null);
+                //posY 30 is the spacing between (4) panels, 130 is the height of upper outer panel of the content, 210 is the total height of the first upper panel combined with existing (or not) spacing before and after it... im so proud of myself XD      
                 // panelObject[i].setOpaque(true);
                 mainContentHolder.add(panelObject[i]);
 
@@ -248,7 +256,7 @@ class SuperMain implements ActionListener{
                 panelObject[i].add(listHolder[i]);
 
                 for (int j = 0; j < picHolder.length; j++){
-                    picHolder[i] = new Panel(Color.ORANGE, pic_holder[0], pic_holder[1], null){
+                    picHolder[i] = new Panel(Color.MAGENTA, pic_holder[0], pic_holder[1], null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -265,7 +273,7 @@ class SuperMain implements ActionListener{
                             g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                         }
                     };
-                    // picHolder[i].setOpaque(true);
+                    picHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     listHolder[i].add(picHolder[i]);
                 }
             };
@@ -286,8 +294,11 @@ class SuperMain implements ActionListener{
         }
     }
 
+    private Boolean is_toggled = false;
+
     @Override
     public void actionPerformed(ActionEvent e) {
+
         if (e.getSource() == libraryButton){
 
             is_toggled = !is_toggled;
@@ -304,8 +315,7 @@ class SuperMain implements ActionListener{
                     object[i].repaint();
                 }
                 libraryButton.setBounds(library_button[0], library_button[1], 220, library_button[3]);
-                libraryButton.revalidate();
-                libraryButton.repaint();
+
                 contentPanel.setBounds(275, content_panel[1], 540, content_panel[3]);
                 contentPanel.revalidate();
                 contentPanel.repaint();
@@ -332,8 +342,7 @@ class SuperMain implements ActionListener{
                     object[i].repaint();
                 }
                 libraryButton.setBounds(library_button[0], library_button[1], library_button[2], library_button[3]);
-                libraryButton.revalidate();
-                libraryButton.repaint();
+
                 contentPanel.setBounds(content_panel[0], content_panel[1], content_panel[2], content_panel[3]);
                 contentPanel.revalidate();
                 contentPanel.repaint();
@@ -355,6 +364,30 @@ class SuperMain implements ActionListener{
 // custom jswing ----------------------------------------------------------------------------------------
 
 class Button extends JButton{
+
+    private Image priv_image;
+    private int priv_imagex;
+    private int priv_imagey;
+    private int priv_image_wh;
+    private int priv_image_ht;
+
+    Button(int posX, int posY, int width, int height, Image image, int imagex, int imagey, int image_wh, int image_ht){
+        this.priv_image = image;
+        this.priv_imagex = imagex;
+        this.priv_imagey = imagey;
+        this.priv_image_wh = image_wh;
+        this.priv_image_ht = image_ht;
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        setFocusable(false);
+        setBounds(posX, posY, width, height);
+        setForeground(Color.WHITE);
+    }
+
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        g.drawImage(priv_image, priv_imagex, priv_imagey, priv_image_wh, priv_image_ht, this);
+    }
+    
     Button(int posX, int posY, int width, int height){
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.setFocusable(false);
