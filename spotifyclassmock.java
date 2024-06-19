@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+
 class SuperMain implements ActionListener{
 
     static Data data = new Data();
@@ -124,7 +125,7 @@ class SuperMain implements ActionListener{
             subPanel = new Panel(new Color(18, 18, 18), sub_panel_sizes[0], sub_panel_sizes[1], null);
             subPanel.setOpaque(true);
 
-                libraryButton = new Button(library_button[0], library_button[1], library_button[2], library_button[3], data.getImageIcon(1).getImage(), 10, 10, library_button[2] -20, library_button[3] -20);
+                libraryButton = new Button(library_button[0], library_button[1], library_button[2], library_button[3], data.getImageIcon(1).getImage(), 10, 10, library_button[2] -20, library_button[3] -20, 0);
                 libraryButton.setContentAreaFilled(false);
                 libraryButton.setBackground(Color.DARK_GRAY);
                 libraryButton.setBorder(BorderFactory.createEmptyBorder());
@@ -133,11 +134,15 @@ class SuperMain implements ActionListener{
                 subPanel.add(libraryButton);
 
                 Label libraryText = new Label(data.getTitle(4), "Myanmar Text", new Color(255, 230, 230), Font.BOLD, 50, 15, 150, 30, 22);
+                libraryText.setBackground(Color.RED);
                 libraryButton.add(libraryText);
 
                 object = new Button[15];
-                for(int i = 0; i < 15; i++){
-                    object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2]);
+                for(int i = 0; i < data.song_array.length; i++){
+                    object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array[i].getImageIcon().getImage(), data.song_array[i].getImageX(), data.song_array[i].getImageY(), data.song_array[i].getImageWidth(), data.song_array[i].getImageHeight(), 0);
+                    object[i].setLayout(null);
+                    object[i].setBorderPainted(false);
+                    object[i].setContentAreaFilled(false);
                     object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subPanel.add(object[i]);
                 }
@@ -277,12 +282,13 @@ class SuperMain implements ActionListener{
     }
 
     private Boolean is_toggled = false;
+    Label[] songTitle = new Label[data.song_array.length];
+    Label[] songAuthor = new Label[data.song_array.length];
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == libraryButton){
-
             is_toggled = !is_toggled;
             if (is_toggled){
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], 255, side_bar_panel[3]);
@@ -291,13 +297,23 @@ class SuperMain implements ActionListener{
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], 240, side_bar_panel[7]);
                 scroll.revalidate();
                 scroll.repaint();
-                for (int i = 0; i < object.length; i++){
+                for (int i = 0; i < data.song_array.length; i++){
                     object[i].setBounds(side_bar_button[0], 60 + (i * 55), 220, side_bar_button[2]);
+                    object[i].setImage(data.song_array[i].getImageCover().getImage());
+                    object[i].setImageX(data.song_array[i].getImageXClicked());
+                    object[i].setImageY(data.song_array[i].getImageYClicked());
+                    object[i].setImageWidth(data.song_array[i].getImageWidthClicked());
+                    object[i].setImageHeight(data.song_array[i].getImageHeightClicked());
+                    object[i].setAlpha(data.song_array[i].getAlpha());
+
+                    songTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", Color.WHITE, Font.BOLD, 10, 2, 220, 30, 13);
+                    object[i].add(songTitle[i]);
+                    songAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", Color.WHITE, Font.BOLD, 10, 20, 220, 30, 10);
+                    object[i].add(songAuthor[i]);
                     object[i].revalidate();
                     object[i].repaint();
                 }
                 libraryButton.setBounds(library_button[0], library_button[1], 220, library_button[3]);
-
                 contentPanel.setBounds(275, content_panel[1], 540, content_panel[3]);
                 contentPanel.revalidate();
                 contentPanel.repaint();
@@ -312,14 +328,23 @@ class SuperMain implements ActionListener{
                 }
             }
             else if (!is_toggled) {
+                
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3]);
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
                 scroll.revalidate();
                 scroll.repaint();
-                for (int i = 0; i < object.length; i++){
+                for (int i = 0; i < data.song_array.length; i++){
                     object[i].setBounds(side_bar_button[0], 60 + (i * 55), side_bar_button[1], side_bar_button[2]);
+                    object[i].setImage(data.song_array[i].getImageIcon().getImage());
+                    object[i].setImageX(data.song_array[i].getImageX());
+                    object[i].setImageY(data.song_array[i].getImageY());
+                    object[i].setImageWidth(data.song_array[i].getImageWidth());
+                    object[i].setImageHeight(data.song_array[i].getImageHeight());
+                    object[i].remove(songTitle[i]);
+                    object[i].remove(songAuthor[i]);
+                    object[i].setAlpha(0);
                     object[i].revalidate();
                     object[i].repaint();
                 }
@@ -352,24 +377,8 @@ class Button extends JButton{
     private int priv_imagey;
     private int priv_image_wh;
     private int priv_image_ht;
+    private int priv_alpha;
 
-    Button(int posX, int posY, int width, int height, Image image, int imagex, int imagey, int image_wh, int image_ht){
-        this.priv_image = image;
-        this.priv_imagex = imagex;
-        this.priv_imagey = imagey;
-        this.priv_image_wh = image_wh;
-        this.priv_image_ht = image_ht;
-        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        setFocusable(false);
-        setBounds(posX, posY, width, height);
-        setForeground(Color.WHITE);
-    }
-
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-        g.drawImage(priv_image, priv_imagex, priv_imagey, priv_image_wh, priv_image_ht, this);
-    }
-    
     Button(int posX, int posY, int width, int height){
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.setFocusable(false);
@@ -381,6 +390,50 @@ class Button extends JButton{
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.setPreferredSize(new Dimension(width, height));
         this.setFocusable(false);
+    }
+
+    Button(int posX, int posY, int width, int height, Image image, int imagex, int imagey, int image_wh, int image_ht, int alpha){
+        this.priv_image = image;
+        this.priv_imagex = imagex;
+        this.priv_imagey = imagey;
+        this.priv_image_wh = image_wh;
+        this.priv_image_ht = image_ht;
+        this.priv_alpha = alpha;
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        setFocusable(false);
+        setBounds(posX, posY, width, height);
+        setForeground(Color.WHITE);
+    }
+
+    public void setImage(Image image){
+        this.priv_image = image;
+    }
+
+    public void setImageX(int value){
+        this.priv_imagex = value;
+    }
+
+    public void setImageY(int value){
+        this.priv_imagey = value;
+    }
+
+    public void setImageWidth(int value){
+        this.priv_image_wh = value;
+    }
+
+    public void setImageHeight(int value){
+        this.priv_image_ht = value;
+    }
+
+    public void setAlpha(int value){
+        this.priv_alpha = value;
+    }
+
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        g.drawImage(priv_image, priv_imagex, priv_imagey, priv_image_wh, priv_image_ht, this);
+        g.setColor(new Color(0, 0, 0, priv_alpha));
+        g.fillRect(0, 0, getWidth(), getHeight());
     }
 }
 
@@ -402,6 +455,10 @@ class Label extends JLabel{
         this.setBounds(posX, posY, width, height);
         this.setForeground(color);
         this.setFont(new Font(text_name, text_style, font_size));
+    }
+
+    public void changeForeground(Color color){
+        this.setForeground(color);
     }
 }
 
