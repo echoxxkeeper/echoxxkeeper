@@ -1,3 +1,4 @@
+// add mouse listener inside the for loop and place the commands inside it...
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -9,17 +10,26 @@ class SuperMain implements ActionListener{
     private Frame frame;
     private Panel sidebarPanel;
         private Panel subPanel;
-        private Button libraryButton;
+        private Button libraryButton; 
+            private Panel overflowLibraryPanel;
+            private Label overflowLibraryText;
     private Panel contentPanel;
         private JScrollPane scroll;
         private Panel subTopPanel;
     private Button[] object;
     private Panel[] listHolder;
+    private Panel[] overflowPanel;
+    private Label[] overflowLabelTitle;
+    private Label[] overflowLabelAuthor;
     
-
+    // variables
     final int arc = 20;
-    // format as follows: posX, posY, width, height
+    final Color font_color = Color.WHITE;
+    final Color dark_gray = new Color(18, 18, 18); 
+    public Boolean library_is_toggled = false;
 
+
+    // format as follows: posX, posY, width, height
     private Integer[] header_panel = {0, -5, 825, 70};
         //format as follows: posX, posY, width, height
         // Integer[] searchbar_value = {155, 20, 400, 40};
@@ -101,7 +111,7 @@ class SuperMain implements ActionListener{
         });
         headerPanel.add(closeButton);
 
-    sidebarPanel = new Panel(new Color(18, 18, 18), side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
+    sidebarPanel = new Panel(dark_gray, side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
@@ -114,15 +124,12 @@ class SuperMain implements ActionListener{
             //Draws the rounded opaque panel with borders
             g2d.setColor(getBackground());
             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-            // g2d.setColor(getForeground());
-            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
         }
-
     };
     frame.add(sidebarPanel);
 
             //Panel that holds the scrollable area in the sidebar.
-            subPanel = new Panel(new Color(18, 18, 18), sub_panel_sizes[0], sub_panel_sizes[1], null);
+            subPanel = new Panel(dark_gray, sub_panel_sizes[0], sub_panel_sizes[1], null);
             subPanel.setOpaque(true);
 
                 libraryButton = new Button(library_button[0], library_button[1], library_button[2], library_button[3], data.getImageIcon(1).getImage(), 10, 10, library_button[2] -20, library_button[3] -20, 0);
@@ -131,13 +138,39 @@ class SuperMain implements ActionListener{
                 libraryButton.setBorder(BorderFactory.createEmptyBorder());
                 libraryButton.setLayout(null);
                 libraryButton.addActionListener(this);
+                libraryButton.addMouseListener(mouse);
                 subPanel.add(libraryButton);
 
-                Label libraryText = new Label(data.getTitle(4), "Myanmar Text", new Color(255, 230, 230), Font.BOLD, 50, 15, 150, 30, 22);
-                libraryText.setBackground(Color.RED);
-                libraryButton.add(libraryText);
+                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, 90, data.getTitle(4).length() * 8, 50, null){
+                        @Override
+                        protected void paintComponent(Graphics g){
+                            super.paintComponent(g);
+                            Dimension arcs = new Dimension(side_bar_panel[8], side_bar_panel[9]);
+                            int width = getWidth();
+                            int height = getHeight();
+                            Graphics2D g2d = (Graphics2D)g;
+                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                            //Draws the rounded opaque panel with borders
+                            g2d.setColor(getBackground());
+                            g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                        }
+
+                        @Override
+                        public boolean contains(int x, int y){
+                            return false;
+                        }
+                    };
+                    frame.add(overflowLibraryPanel);
+
+                        overflowLibraryText = new Label(data.getTitle(4), "Myanmar Text", new Color(255,255,255,0), Font.BOLD, 4, 4, data.getTitle(4).length() * 8, 50, 14);
+                        overflowLibraryPanel.add(overflowLibraryText);
 
                 object = new Button[15];
+                overflowPanel = new Panel[15];
+                overflowLabelTitle = new Label[15];
+                overflowLabelAuthor = new Label[15];
+                
                 for(int i = 0; i < data.song_array.length; i++){
                     object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array[i].getImageIcon().getImage(), data.song_array[i].getImageX(), data.song_array[i].getImageY(), data.song_array[i].getImageWidth(), data.song_array[i].getImageHeight(), 0);
                     object[i].setLayout(null);
@@ -145,7 +178,59 @@ class SuperMain implements ActionListener{
                     object[i].setContentAreaFilled(false);
                     object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subPanel.add(object[i]);
+
+                    overflowPanel[i] = new Panel(new Color(110, 110, 110, 0), 95, 144 + (i * 55), (data.song_array[i].getName().length() + 4) * 6, 50, null){
+                        @Override
+                        protected void paintComponent(Graphics g){
+                            super.paintComponent(g);
+                            Dimension arcs = new Dimension(20, 20);
+                            int width = getWidth();
+                            int height = getHeight();
+                            Graphics2D g2d = (Graphics2D)g;
+                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                            //Draws the rounded opaque panel with borders
+                            g2d.setColor(getBackground());
+                            g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                        }
+
+                        @Override
+                        public boolean contains(int x, int y){
+                            return false;
+                        }
+                    };
+                    frame.add(overflowPanel[i]);
+
+                    overflowLabelTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -10, data.song_array[i].getName().length() * 10, 50, 13);
+                    overflowPanel[i].add(overflowLabelTitle[i]);
+
+                    overflowLabelAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, data.song_array[i].getAuthor().length() * 10, 50, 12);
+                    overflowPanel[i].add(overflowLabelAuthor[i]);
                 }
+
+                for (int i = 0; i < data.song_array.length; i++){
+                    final int index = i;
+                    object[i].addMouseListener(new MouseListener() {
+                        public void mouseEntered(MouseEvent e){
+                            if(library_is_toggled == false){
+                            overflowPanel[index].setBackground(new Color(110, 110, 110, 255));
+                            overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 255));
+                            overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 255));
+                            }
+                            else{
+                                overflowPanel[index].setOpaque(false);
+                                overflowLabelTitle[index].setOpaque(false);
+                                overflowLabelAuthor[index].setOpaque(false);
+                            }
+                        }
+                        public void mouseExited(MouseEvent e){
+                            overflowPanel[index].setBackground(new Color(110, 110, 110, 0));
+                            overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 0));
+                            overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 0));
+                        }
+                    });
+                }
+                
 
             scroll = new JScrollPane(subPanel);
             scroll.getVerticalScrollBar().setUnitIncrement(5);
@@ -157,7 +242,7 @@ class SuperMain implements ActionListener{
         
 
         //Color, posX, posY, width, height
-    contentPanel = new Panel(new Color(18, 18, 18), content_panel[0], content_panel[1], content_panel[2], content_panel[3], null){
+    contentPanel = new Panel(dark_gray, content_panel[0], content_panel[1], content_panel[2], content_panel[3], null){
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
@@ -170,8 +255,6 @@ class SuperMain implements ActionListener{
             //Draws the rounded opaque panel with borders
             g2d.setColor(getBackground());
             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-            // g2d.setColor(getForeground());
-            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
         }
     
     };
@@ -186,7 +269,7 @@ class SuperMain implements ActionListener{
 
             subTopPanel = new Panel(null, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
             // grid layout set on a 2x4 rowXcolumn with a set size
-                Color[] color_array = {Color.BLACK, Color.RED, Color.GREEN, Color.WHITE, Color.CYAN, Color.MAGENTA, Color.PINK, Color.YELLOW};
+                Color[] color_array = {Color.BLACK, Color.RED, Color.GREEN, font_color, Color.CYAN, Color.MAGENTA, Color.PINK, Color.YELLOW};
                 Panel[] playlist = new Panel[8];
 
                 //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat parent container: supTopPanel.
@@ -205,8 +288,6 @@ class SuperMain implements ActionListener{
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            // g2d.setColor(getForeground());
-                            // g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                         }
                     };
                     playlist[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -235,7 +316,7 @@ class SuperMain implements ActionListener{
                 // panelObject[i].setOpaque(true);
                 mainContentHolder.add(panelObject[i]);
 
-                mainTitle[i] = new Label(data.getTitle(i), "Myanmar Text", Color.WHITE, Font.BOLD, main_title[0], main_title[1], main_title[2], main_title[3], main_title[4]);
+                mainTitle[i] = new Label(data.getTitle(i), "Myanmar Text", font_color, Font.BOLD, main_title[0], main_title[1], main_title[2], main_title[3], main_title[4]);
                 panelObject[i].add(mainTitle[i]);
 
                 listHolder[i] = new Panel(Color.BLUE, list_holder[0], list_holder[1], list_holder[2], list_holder[3], new GridLayout(list_holder[4], list_holder[5], list_holder[6] , list_holder[7]));
@@ -256,14 +337,13 @@ class SuperMain implements ActionListener{
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            g2d.setColor(getForeground());
-                            g2d.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                         }
                     };
                     picHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     listHolder[i].add(picHolder[i]);
                 }
             };
+
     frame.setVisible(true);
     }
 
@@ -279,9 +359,19 @@ class SuperMain implements ActionListener{
             Point currentPt = e.getLocationOnScreen();
             frame.setLocation(currentPt.x - mouse_rel_comp_coords.x, currentPt.y - mouse_rel_comp_coords.y);
         }
+        public void mouseEntered(MouseEvent e){
+            if (e.getSource() == libraryButton){
+                overflowLibraryPanel.setBackground(new Color(110,110,110,255));
+                overflowLibraryText.setForeground(new Color(255,255,255,255));
+            }
+        }
+        public void mouseExited(MouseEvent e){
+            if (e.getSource() == libraryButton){
+                overflowLibraryPanel.setBackground(new Color(110,110,110, 0));
+                overflowLibraryText.setForeground(new Color(255,255,255,0));
+            }
+        }
     }
-
-    private Boolean is_toggled = false;
     Label[] songTitle = new Label[data.song_array.length];
     Label[] songAuthor = new Label[data.song_array.length];
 
@@ -289,8 +379,8 @@ class SuperMain implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == libraryButton){
-            is_toggled = !is_toggled;
-            if (is_toggled){
+            library_is_toggled = !library_is_toggled;
+            if (library_is_toggled){
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], 255, side_bar_panel[3]);
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
@@ -306,9 +396,9 @@ class SuperMain implements ActionListener{
                     object[i].setImageHeight(data.song_array[i].getImageHeightClicked());
                     object[i].setAlpha(data.song_array[i].getAlpha());
 
-                    songTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", Color.WHITE, Font.BOLD, 10, 2, 220, 30, 13);
+                    songTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", font_color, Font.BOLD, 10, 2, 220, 30, 13);
                     object[i].add(songTitle[i]);
-                    songAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", Color.WHITE, Font.BOLD, 10, 20, 220, 30, 10);
+                    songAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", font_color, Font.BOLD, 10, 20, 220, 30, 10);
                     object[i].add(songAuthor[i]);
                     object[i].revalidate();
                     object[i].repaint();
@@ -327,7 +417,7 @@ class SuperMain implements ActionListener{
                     listHolder[i].repaint();
                 }
             }
-            else if (!is_toggled) {
+            else if (!library_is_toggled) {
                 
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3]);
                 sidebarPanel.revalidate();
