@@ -1,6 +1,9 @@
-// add mouse listener inside the for loop and place the commands inside it...
+// fix the overflow to be responsive when scrolling...
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.event.*;
 
 
@@ -11,6 +14,7 @@ class SuperMain implements ActionListener{
     private Panel sidebarPanel;
         private Panel subPanel;
         private Button libraryButton; 
+        private Label libraryText;
             private Panel overflowLibraryPanel;
             private Label overflowLibraryText;
     private Panel contentPanel;
@@ -25,8 +29,10 @@ class SuperMain implements ActionListener{
     // variables
     final int arc = 20;
     final Color font_color = Color.WHITE;
-    final Color dark_gray = new Color(18, 18, 18); 
+    final Color dark_gray = new Color(18, 18, 18);
     public Boolean library_is_toggled = false;
+    private int scroll_y_pos;
+    private int sidebar_button_view_y_pos;
 
 
     // format as follows: posX, posY, width, height
@@ -141,7 +147,30 @@ class SuperMain implements ActionListener{
                 libraryButton.addMouseListener(mouse);
                 subPanel.add(libraryButton);
 
-                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, 90, data.getTitle(4).length() * 8, 50, null){
+                scroll = new JScrollPane(subPanel);
+                scroll.getVerticalScrollBar().setUnitIncrement(5);
+                scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
+                scroll.setBorder(BorderFactory.createEmptyBorder());
+                scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+                scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scroll.getViewport().addChangeListener(new ChangeListener(){
+
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        JViewport vp = (JViewport) e.getSource();
+                        Point vp_pt = vp.getViewPosition();
+                        sidebar_button_view_y_pos = vp_pt.y;
+                    }
+                    
+                });
+                sidebarPanel.add(scroll);
+
+                    libraryText = new Label(data.getTitle(4), "Myanmar Text", font_color, Font.BOLD, 55, 5, 200, 50, 22);
+                    libraryButton.add(libraryText);
+
+                    scroll_y_pos = sidebarPanel.getY() + scroll.getY();
+
+                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, scroll_y_pos + libraryButton.getY(), data.getTitle(4).length() * 8, 50, null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -166,53 +195,78 @@ class SuperMain implements ActionListener{
                         overflowLibraryText = new Label(data.getTitle(4), "Myanmar Text", new Color(255,255,255,0), Font.BOLD, 4, 4, data.getTitle(4).length() * 8, 50, 14);
                         overflowLibraryPanel.add(overflowLibraryText);
 
-                object = new Button[15];
-                overflowPanel = new Panel[15];
-                overflowLabelTitle = new Label[15];
-                overflowLabelAuthor = new Label[15];
-                
-                for(int i = 0; i < data.song_array.length; i++){
-                    object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array[i].getImageIcon().getImage(), data.song_array[i].getImageX(), data.song_array[i].getImageY(), data.song_array[i].getImageWidth(), data.song_array[i].getImageHeight(), 0);
-                    object[i].setLayout(null);
-                    object[i].setBorderPainted(false);
-                    object[i].setContentAreaFilled(false);
-                    object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    subPanel.add(object[i]);
+                        object = new Button[15];
+                        overflowPanel = new Panel[15];
+                        overflowLabelTitle = new Label[15];
+                        overflowLabelAuthor = new Label[15];
+                        
+                        for(int i = 0; i < data.song_array.length; i++){
+                            object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array[i].getImageIcon().getImage(), data.song_array[i].getImageX(), data.song_array[i].getImageY(), data.song_array[i].getImageWidth(), data.song_array[i].getImageHeight(), 0);
+                            object[i].setLayout(null);
+                            object[i].setBorderPainted(false);
+                            object[i].setContentAreaFilled(false);
+                            object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            subPanel.add(object[i]);
 
-                    overflowPanel[i] = new Panel(new Color(110, 110, 110, 0), 95, 144 + (i * 55), (data.song_array[i].getName().length() + 4) * 6, 50, null){
-                        @Override
-                        protected void paintComponent(Graphics g){
-                            super.paintComponent(g);
-                            Dimension arcs = new Dimension(20, 20);
-                            int width = getWidth();
-                            int height = getHeight();
-                            Graphics2D g2d = (Graphics2D)g;
-                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                            //Draws the rounded opaque panel with borders
-                            g2d.setColor(getBackground());
-                            g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                            overflowPanel[i] = new Panel(new Color(110, 110, 110, 0), 95, scroll_y_pos + object[i].getY(), (data.song_array[i].getName().length() + 5) * 6, 50, null){
+                                @Override
+                                protected void paintComponent(Graphics g){
+                                    super.paintComponent(g);
+                                    Dimension arcs = new Dimension(20, 20);
+                                    int width = getWidth();
+                                    int height = getHeight();
+                                    Graphics2D g2d = (Graphics2D)g;
+                                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        
+                                    //Draws the rounded opaque panel with borders
+                                    g2d.setColor(getBackground());
+                                    g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                                }
+
+                                @Override
+                                public boolean contains(int x, int y){
+                                    return false;
+                                }
+                            };
+                            frame.add(overflowPanel[i]);
+
+                            overflowLabelTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -7, data.song_array[i].getName().length() * 10, 50, 13);
+                            overflowPanel[i].add(overflowLabelTitle[i]);
+
+                            overflowLabelAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, (data.song_array[i].getName().length() + 2) * 6, 50, 12);
+                            overflowPanel[i].add(overflowLabelAuthor[i]);
                         }
 
-                        @Override
-                        public boolean contains(int x, int y){
-                            return false;
-                        }
-                    };
-                    frame.add(overflowPanel[i]);
+                                // make the toggled button light up when hovered..
+                                for (int i = 0; i < data.song_array.length; i++){
+                                    final int index = i;
+                                    object[i].addMouseListener(new MouseListener() {
+                                        public void mouseEntered(MouseEvent e){
+                                            if (library_is_toggled){
+                                                object[index].setAlpha(data.song_array[index].getAlpha() - 50);
+                                            }
+                                            else{
+                                                object[index].setAlpha(0);
+                                            }
+                                        }
+                                        public void mouseExited(MouseEvent e){
+                                            if (library_is_toggled){
+                                                object[index].setAlpha(data.song_array[index].getAlpha());
+                                            }
+                                            else{
+                                                object[index].setAlpha(0);
+                                            }
+                                        }
+                                    });
+                                }
 
-                    overflowLabelTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -10, data.song_array[i].getName().length() * 10, 50, 13);
-                    overflowPanel[i].add(overflowLabelTitle[i]);
-
-                    overflowLabelAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, data.song_array[i].getAuthor().length() * 10, 50, 12);
-                    overflowPanel[i].add(overflowLabelAuthor[i]);
-                }
-
+                // to make the overflow panel appears when hovered
                 for (int i = 0; i < data.song_array.length; i++){
                     final int index = i;
                     object[i].addMouseListener(new MouseListener() {
                         public void mouseEntered(MouseEvent e){
                             if(library_is_toggled == false){
+                            overflowPanel[index].setBounds(95, scroll_y_pos + object[index].getY() - sidebar_button_view_y_pos, (data.song_array[index].getName().length() + 5) * 6, 50);
                             overflowPanel[index].setBackground(new Color(110, 110, 110, 255));
                             overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 255));
                             overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 255));
@@ -230,15 +284,6 @@ class SuperMain implements ActionListener{
                         }
                     });
                 }
-                
-
-            scroll = new JScrollPane(subPanel);
-            scroll.getVerticalScrollBar().setUnitIncrement(5);
-            scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
-            scroll.setBorder(BorderFactory.createEmptyBorder());
-            scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-            scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            sidebarPanel.add(scroll);
         
 
         //Color, posX, posY, width, height
@@ -361,14 +406,21 @@ class SuperMain implements ActionListener{
         }
         public void mouseEntered(MouseEvent e){
             if (e.getSource() == libraryButton){
-                overflowLibraryPanel.setBackground(new Color(110,110,110,255));
-                overflowLibraryText.setForeground(new Color(255,255,255,255));
+                if (library_is_toggled){}
+                else{
+                    overflowLibraryPanel.setBounds(95, scroll_y_pos + libraryButton.getY() - sidebar_button_view_y_pos, data.getTitle(4).length() * 8, 50);
+                    overflowLibraryPanel.setBackground(new Color(110,110,110,255));
+                    overflowLibraryText.setForeground(new Color(255,255,255,255));
+                }
             }
         }
         public void mouseExited(MouseEvent e){
             if (e.getSource() == libraryButton){
-                overflowLibraryPanel.setBackground(new Color(110,110,110, 0));
-                overflowLibraryText.setForeground(new Color(255,255,255,0));
+                if (library_is_toggled){}
+                else{
+                    overflowLibraryPanel.setBackground(new Color(110,110,110, 0));
+                    overflowLibraryText.setForeground(new Color(255,255,255,0));
+                }
             }
         }
     }
@@ -403,6 +455,7 @@ class SuperMain implements ActionListener{
                     object[i].revalidate();
                     object[i].repaint();
                 }
+
                 libraryButton.setBounds(library_button[0], library_button[1], 220, library_button[3]);
                 contentPanel.setBounds(275, content_panel[1], 540, content_panel[3]);
                 contentPanel.revalidate();
