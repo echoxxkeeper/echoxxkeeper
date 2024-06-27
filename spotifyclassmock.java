@@ -1,10 +1,12 @@
-// fix the overflow to be responsive when scrolling...
+// try drawing an larger image with no rounded corners, then make a clip again that draw another smaller image to maybe remove the edge...
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
 
 
 class SuperMain implements ActionListener{
@@ -44,21 +46,21 @@ class SuperMain implements ActionListener{
         //format as follows: posX, posY, width, height
         private Integer[] close_value = {735, 5, 90, 65};
 
-    // format as follows: posX, posY, width, height, JScrollPane posX, JScrollPane posY JScrollPane height, JScrollPane width, arcX, arcY.
-    private Integer[] side_bar_panel = {10, 80, 80, 650, 5, 5, 70, 630, 20, 20};
+    // format as follows: posX, posY, width, height, JScrollPane posX, JScrollPane posY, JScrollPane width, JScrollPane height, arcX, arcY.
+    private Integer[] side_bar_panel = {10, 80, 80, 650, 5, 65, 70, 570, 20, 20};
         // format as follows: height, width
-        private Integer[] sub_panel_sizes= {882, 50};
+        private Integer[] sub_panel_sizes= {837, 50};
         // format as follows: posX, posY, width, height
-        private Integer[] library_button = {9, 5, 50, 50};
+        private Integer[] library_button = {15, 5, 50, 50};
         // format as follows: posX, width, height
         private Integer[] side_bar_button = {9, 50, 50};
         // format as follows: posX, posY, width, height, JScrollPane posX, JScrollPane posY, JScrollPane width, JScrollPane height, arcX, arcY 
         
     private Integer[] content_panel = {100, 80, 715, 650, 10, 10, 695, 630, 20, 20};
     //format as follows: width, and height
-        private Integer[] main_content_holder = {0, 1480};
+        private Integer[] main_content_holder = {0, 1550};
         // array list as follows: posX, posY, width, height, gridLayout_row, gridLayout_column, grid_hgap, grid_vgap
-        private Integer[] sub_top_panel = {1, 1, 694, 130, 2, 4, 5, 5};
+        private Integer[] sub_top_panel = {1, 1, 694, 230, 4, 2, 20, 5};
 
         // outer panel that holds the entire for loop, as follows: posX, width, height
         private Integer[] panel_object = {0, 694, 280};
@@ -72,7 +74,6 @@ class SuperMain implements ActionListener{
     SuperMain(){
     
     frame = new Frame(null);
-
     Panel headerPanel = new Panel(Color.BLUE, header_panel[0], header_panel[1], header_panel[2], header_panel[3], null);
     MouseListener mouse = new MouseListener(); 
     headerPanel.setOpaque(false);
@@ -145,7 +146,7 @@ class SuperMain implements ActionListener{
                 libraryButton.setLayout(null);
                 libraryButton.addActionListener(this);
                 libraryButton.addMouseListener(mouse);
-                subPanel.add(libraryButton);
+                sidebarPanel.add(libraryButton);
 
                 scroll = new JScrollPane(subPanel);
                 scroll.getVerticalScrollBar().setUnitIncrement(5);
@@ -170,7 +171,7 @@ class SuperMain implements ActionListener{
 
                     scroll_y_pos = sidebarPanel.getY() + scroll.getY();
 
-                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, scroll_y_pos + libraryButton.getY(), data.getTitle(4).length() * 8, 50, null){
+                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, sidebarPanel.getY() + libraryButton.getY(), data.getTitle(4).length() * 8, 50, null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -199,16 +200,17 @@ class SuperMain implements ActionListener{
                         overflowPanel = new Panel[15];
                         overflowLabelTitle = new Label[15];
                         overflowLabelAuthor = new Label[15];
-                        
-                        for(int i = 0; i < data.song_array.length; i++){
-                            object[i] = new Button(side_bar_button[0], 60 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array[i].getImageIcon().getImage(), data.song_array[i].getImageX(), data.song_array[i].getImageY(), data.song_array[i].getImageWidth(), data.song_array[i].getImageHeight(), 0);
+
+
+                        for(int i = 0; i < data.song_array_sidebar.size(); i++){
+                            object[i] = new Button(side_bar_button[0], 10 + (i * 55) ,side_bar_button[1], side_bar_button[2], data.song_array_sidebar.get(i).getImageIcon().getImage(), data.song_array_sidebar.get(i).getImageX(), data.song_array_sidebar.get(i).getImageY(), data.song_array_sidebar.get(i).getImageWidth(), data.song_array_sidebar.get(i).getImageHeight(), 0);
                             object[i].setLayout(null);
                             object[i].setBorderPainted(false);
                             object[i].setContentAreaFilled(false);
                             object[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                             subPanel.add(object[i]);
 
-                            overflowPanel[i] = new Panel(new Color(110, 110, 110, 0), 95, scroll_y_pos + object[i].getY(), (data.song_array[i].getName().length() + 5) * 6, 50, null){
+                            overflowPanel[i] = new Panel(new Color(110, 110, 110, 0), 95, scroll_y_pos + object[i].getY(), (data.song_array_sidebar.get(i).getName().length() + 5) * 6, 50, null){
                                 @Override
                                 protected void paintComponent(Graphics g){
                                     super.paintComponent(g);
@@ -230,57 +232,45 @@ class SuperMain implements ActionListener{
                             };
                             frame.add(overflowPanel[i]);
 
-                            overflowLabelTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -7, data.song_array[i].getName().length() * 10, 50, 13);
+                            overflowLabelTitle[i] = new Label(data.song_array_sidebar.get(i).getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -7, data.song_array_sidebar.get(i).getName().length() * 10, 50, 13);
                             overflowPanel[i].add(overflowLabelTitle[i]);
 
-                            overflowLabelAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, (data.song_array[i].getName().length() + 2) * 6, 50, 12);
+                            overflowLabelAuthor[i] = new Label(data.song_array_sidebar.get(i).getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, (data.song_array_sidebar.get(i).getName().length() + 2) * 6, 50, 12);
                             overflowPanel[i].add(overflowLabelAuthor[i]);
                         }
 
-                                // make the toggled button light up when hovered..
-                                for (int i = 0; i < data.song_array.length; i++){
-                                    final int index = i;
-                                    object[i].addMouseListener(new MouseListener() {
-                                        public void mouseEntered(MouseEvent e){
-                                            if (library_is_toggled){
-                                                object[index].setAlpha(data.song_array[index].getAlpha() - 50);
-                                            }
-                                            else{
-                                                object[index].setAlpha(0);
-                                            }
-                                        }
-                                        public void mouseExited(MouseEvent e){
-                                            if (library_is_toggled){
-                                                object[index].setAlpha(data.song_array[index].getAlpha());
-                                            }
-                                            else{
-                                                object[index].setAlpha(0);
-                                            }
-                                        }
-                                    });
-                                }
-
-                // to make the overflow panel appears when hovered
-                for (int i = 0; i < data.song_array.length; i++){
+                // to make the overflow panel appears and make it glow when hovered
+                for (int i = 0; i < data.song_array_sidebar.size(); i++){
                     final int index = i;
                     object[i].addMouseListener(new MouseListener() {
                         public void mouseEntered(MouseEvent e){
-                            if(library_is_toggled == false){
-                            overflowPanel[index].setBounds(95, scroll_y_pos + object[index].getY() - sidebar_button_view_y_pos, (data.song_array[index].getName().length() + 5) * 6, 50);
+                            if(!library_is_toggled){
+                            overflowPanel[index].setBounds(95, scroll_y_pos + object[index].getY() - sidebar_button_view_y_pos, (data.song_array_sidebar.get(index).getName().length() + 5) * 6, 50);
                             overflowPanel[index].setBackground(new Color(110, 110, 110, 255));
                             overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 255));
                             overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 255));
+
+                            object[index].setAlpha(0);
                             }
                             else{
                                 overflowPanel[index].setOpaque(false);
                                 overflowLabelTitle[index].setOpaque(false);
                                 overflowLabelAuthor[index].setOpaque(false);
+
+                                object[index].setAlpha(data.song_array_sidebar.get(index).getAlpha() - 50);
                             }
                         }
                         public void mouseExited(MouseEvent e){
-                            overflowPanel[index].setBackground(new Color(110, 110, 110, 0));
-                            overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 0));
-                            overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 0));
+                            if (!library_is_toggled){
+                                overflowPanel[index].setBackground(new Color(110, 110, 110, 0));
+                                overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 0));
+                                overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 0));
+
+                                object[index].setAlpha(0);
+                            }
+                            else{
+                                object[index].setAlpha(data.song_array_sidebar.get(index).getAlpha());
+                            }
                         }
                     });
                 }
@@ -312,15 +302,15 @@ class SuperMain implements ActionListener{
     mainContentHolder.setBackground(new Color(18, 18, 18));
     mainContentHolder.setPreferredSize(new Dimension(main_content_holder[0], main_content_holder[1]));
 
-            subTopPanel = new Panel(null, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
+            subTopPanel = new Panel(Color.MAGENTA, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
+
             // grid layout set on a 2x4 rowXcolumn with a set size
-                Color[] color_array = {Color.BLACK, Color.RED, Color.GREEN, font_color, Color.CYAN, Color.MAGENTA, Color.PINK, Color.YELLOW};
                 Panel[] playlist = new Panel[8];
 
                 //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat parent container: supTopPanel.
 
                 for (int i = 0; i < 8; i++){
-                    playlist[i] = new Panel(color_array[i], 0, 0, null){
+                    playlist[i] = new Panel(new Color(110, 110, 110, 50), 0, 0, null, data.recently_clicked_non_artist.get(i).getImageAsRecentlyPlayed()){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -329,12 +319,17 @@ class SuperMain implements ActionListener{
                             int height = getHeight();
                             Graphics2D g2d = (Graphics2D)g;
                             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
             
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
+                            g2d.setClip(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), arcs.width, arcs.height));
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                            g2d.drawImage(getImageIcon().getImage(), 0, 0, getHeight()-1, getHeight()-1, null);
                         }
                     };
+
+
                     playlist[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subTopPanel.add(playlist[i]);
                 }
@@ -356,8 +351,8 @@ class SuperMain implements ActionListener{
     Panel[] picHolder = new Panel[4]; //album itself.
 
             for (int i = 0; i < panelObject.length; i++){
-                panelObject[i] = new Panel(Color.RED, panel_object[0], (60 + 130) + (i * 330), panel_object[1], panel_object[2], null);
-                //posY 30 is the spacing between (4) panels, 130 is the height of upper outer panel of the content, 210 is the total height of the first upper panel combined with existing (or not) spacing before and after it... im so proud of myself XD      
+                panelObject[i] = new Panel(Color.RED, panel_object[0], (130 + 130) + (i * 330), panel_object[1], panel_object[2], null);
+                //posY 130 is the spacing between (4) panels and the added gap, 130 is the height of upper outer panel of the content, 210 is the total height of the first upper panel combined with existing (or not) spacing before and after it...    
                 // panelObject[i].setOpaque(true);
                 mainContentHolder.add(panelObject[i]);
 
@@ -369,7 +364,7 @@ class SuperMain implements ActionListener{
                 panelObject[i].add(listHolder[i]);
 
                 for (int j = 0; j < picHolder.length; j++){
-                    picHolder[i] = new Panel(Color.MAGENTA, pic_holder[0], pic_holder[1], null){
+                    picHolder[i] = new Panel(new Color(110, 110, 110, 50), pic_holder[0], pic_holder[1], null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -388,7 +383,6 @@ class SuperMain implements ActionListener{
                     listHolder[i].add(picHolder[i]);
                 }
             };
-
     frame.setVisible(true);
     }
 
@@ -408,7 +402,7 @@ class SuperMain implements ActionListener{
             if (e.getSource() == libraryButton){
                 if (library_is_toggled){}
                 else{
-                    overflowLibraryPanel.setBounds(95, scroll_y_pos + libraryButton.getY() - sidebar_button_view_y_pos, data.getTitle(4).length() * 8, 50);
+                    overflowLibraryPanel.setBounds(95, sidebarPanel.getY() + libraryButton.getY(), data.getTitle(4).length() * 8, 50);
                     overflowLibraryPanel.setBackground(new Color(110,110,110,255));
                     overflowLibraryText.setForeground(new Color(255,255,255,255));
                 }
@@ -424,8 +418,8 @@ class SuperMain implements ActionListener{
             }
         }
     }
-    Label[] songTitle = new Label[data.song_array.length];
-    Label[] songAuthor = new Label[data.song_array.length];
+    Label[] songTitle = new Label[data.song_array_sidebar.size()];
+    Label[] songAuthor = new Label[data.song_array_sidebar.size()];
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -439,18 +433,18 @@ class SuperMain implements ActionListener{
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], 240, side_bar_panel[7]);
                 scroll.revalidate();
                 scroll.repaint();
-                for (int i = 0; i < data.song_array.length; i++){
-                    object[i].setBounds(side_bar_button[0], 60 + (i * 55), 220, side_bar_button[2]);
-                    object[i].setImage(data.song_array[i].getImageCover().getImage());
-                    object[i].setImageX(data.song_array[i].getImageXClicked());
-                    object[i].setImageY(data.song_array[i].getImageYClicked());
-                    object[i].setImageWidth(data.song_array[i].getImageWidthClicked());
-                    object[i].setImageHeight(data.song_array[i].getImageHeightClicked());
-                    object[i].setAlpha(data.song_array[i].getAlpha());
+                for (int i = 0; i < data.song_array_sidebar.size(); i++){
+                    object[i].setBounds(side_bar_button[0], 10 + (i * 55), 220, side_bar_button[2]);
+                    object[i].setImage(data.song_array_sidebar.get(i).getImageCover().getImage());
+                    object[i].setImageX(data.song_array_sidebar.get(i).getImageXClicked());
+                    object[i].setImageY(data.song_array_sidebar.get(i).getImageYClicked());
+                    object[i].setImageWidth(data.song_array_sidebar.get(i).getImageWidthClicked());
+                    object[i].setImageHeight(data.song_array_sidebar.get(i).getImageHeightClicked());
+                    object[i].setAlpha(data.song_array_sidebar.get(i).getAlpha());
 
-                    songTitle[i] = new Label(data.song_array[i].getName(), "Myanmar Text", font_color, Font.BOLD, 10, 2, 220, 30, 13);
+                    songTitle[i] = new Label(data.song_array_sidebar.get(i).getName(), "Myanmar Text", font_color, Font.BOLD, 10, 2, 220, 30, 13);
                     object[i].add(songTitle[i]);
-                    songAuthor[i] = new Label(data.song_array[i].getAuthor(), "Myanmar Text", font_color, Font.BOLD, 10, 20, 220, 30, 10);
+                    songAuthor[i] = new Label(data.song_array_sidebar.get(i).getAuthor(), "Myanmar Text", font_color, Font.BOLD, 10, 20, 220, 30, 10);
                     object[i].add(songAuthor[i]);
                     object[i].revalidate();
                     object[i].repaint();
@@ -478,13 +472,13 @@ class SuperMain implements ActionListener{
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
                 scroll.revalidate();
                 scroll.repaint();
-                for (int i = 0; i < data.song_array.length; i++){
-                    object[i].setBounds(side_bar_button[0], 60 + (i * 55), side_bar_button[1], side_bar_button[2]);
-                    object[i].setImage(data.song_array[i].getImageIcon().getImage());
-                    object[i].setImageX(data.song_array[i].getImageX());
-                    object[i].setImageY(data.song_array[i].getImageY());
-                    object[i].setImageWidth(data.song_array[i].getImageWidth());
-                    object[i].setImageHeight(data.song_array[i].getImageHeight());
+                for (int i = 0; i < data.song_array_sidebar.size(); i++){
+                    object[i].setBounds(side_bar_button[0], 10 + (i * 55), side_bar_button[1], side_bar_button[2]);
+                    object[i].setImage(data.song_array_sidebar.get(i).getImageIcon().getImage());
+                    object[i].setImageX(data.song_array_sidebar.get(i).getImageX());
+                    object[i].setImageY(data.song_array_sidebar.get(i).getImageY());
+                    object[i].setImageWidth(data.song_array_sidebar.get(i).getImageWidth());
+                    object[i].setImageHeight(data.song_array_sidebar.get(i).getImageHeight());
                     object[i].remove(songTitle[i]);
                     object[i].remove(songAuthor[i]);
                     object[i].setAlpha(0);
@@ -606,10 +600,21 @@ class Label extends JLabel{
 }
 
 class Panel extends JPanel{
+
+    ImageIcon priv_image;
+
     Panel(Color color, int posX, int posY, int width, int height, LayoutManager layout_style){
         this.setBounds(posX, posY, width, height);
         this.setOpaque(false);
         this.setLayout(layout_style);;
+        this.setBackground(color);
+    }
+
+    Panel(Color color, int posX, int posY, int width, int height, LayoutManager layout_style, ImageIcon image){
+        this.priv_image = image;
+        this.setBounds(posX, posY, width, height);
+        this.setOpaque(false);
+        this.setLayout(layout_style);
         this.setBackground(color);
     }
 
@@ -618,5 +623,17 @@ class Panel extends JPanel{
         this.setLayout(layout_style);
         this.setPreferredSize(new Dimension(width, height));
         this.setBackground(color);
+    }
+
+    Panel(Color color, int height, int width, LayoutManager layout_style, ImageIcon image){
+        this.priv_image = image;
+        this.setOpaque(false);
+        this.setLayout(layout_style);
+        this.setPreferredSize(new Dimension(width, height));
+        this.setBackground(color);
+    }
+
+    public ImageIcon getImageIcon(){
+        return priv_image;
     }
 }
