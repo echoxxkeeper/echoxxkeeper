@@ -1,4 +1,4 @@
-// try drawing an larger image with no rounded corners, then make a clip again that draw another smaller image to maybe remove the edge...
+// customize the label inside subTopPanel so whenever the library button is toggled, it will resize the way you wanted it to be.
 
 import java.awt.*;
 import javax.swing.*;
@@ -334,6 +334,9 @@ class SuperMain implements ActionListener{
                     playlistPanel[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subTopPanel.add(playlistPanel[i]);  
 
+                    int html_text_size = data.recently_clicked_non_artist.get(i).getHTMLText().length();
+                    titleText[i] = new Label(data.recently_clicked_non_artist.get(i).getHTMLText(), "Myanmar Text", font_color, Font.BOLD, 60, 7, html_text_size * 7, 30, 15);
+                    playlistPanel[i].add(titleText[i]);
 
                 }
                 mainContentHolder.add(subTopPanel);
