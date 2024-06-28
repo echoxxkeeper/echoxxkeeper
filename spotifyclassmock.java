@@ -13,25 +13,28 @@ class SuperMain implements ActionListener{
 
     static Data data = new Data();
     private Frame frame;
-    private Panel sidebarPanel;
-        private Panel subPanel;
-        private Button libraryButton; 
-        private Label libraryText;
-            private Panel overflowLibraryPanel;
-            private Label overflowLibraryText;
-    private Panel contentPanel;
-        private JScrollPane scroll;
-        private Panel subTopPanel;
-    private Button[] object;
-    private Panel[] listHolder;
-    private Panel[] overflowPanel;
-    private Label[] overflowLabelTitle;
-    private Label[] overflowLabelAuthor;
-    
+        private Panel sidebarPanel;
+            private JScrollPane scroll;
+            private Panel subPanel;
+                private Button libraryButton;
+                    private Label libraryText;
+                private Button[] object;
+                    private Panel overflowLibraryPanel;
+                    private Label overflowLibraryText;
+        private Panel contentPanel;
+            private Panel subTopPanel;
+                Panel[] playlistPanel;
+                    Label[] titleText;
+            private Panel[] listHolder;
+            private Panel[] overflowPanel;
+            private Label[] overflowLabelTitle;
+            private Label[] overflowLabelAuthor;
+
     // variables
     final int arc = 20;
-    final Color font_color = Color.WHITE;
+    final Color font_color = new Color(255,255,255);
     final Color dark_gray = new Color(18, 18, 18);
+    final Color transparent_gray = new Color(110, 110, 110, 50);
     public Boolean library_is_toggled = false;
     private int scroll_y_pos;
     private int sidebar_button_view_y_pos;
@@ -171,7 +174,7 @@ class SuperMain implements ActionListener{
 
                     scroll_y_pos = sidebarPanel.getY() + scroll.getY();
 
-                    overflowLibraryPanel = new Panel(new Color(110, 110, 110, 0), 95, sidebarPanel.getY() + libraryButton.getY(), data.getTitle(4).length() * 8, 50, null){
+                    overflowLibraryPanel = new Panel(new Color(255,255,255,0), 95, sidebarPanel.getY() + libraryButton.getY(), data.getTitle(4).length() * 8, 50, null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -232,7 +235,7 @@ class SuperMain implements ActionListener{
                             };
                             frame.add(overflowPanel[i]);
 
-                            overflowLabelTitle[i] = new Label(data.song_array_sidebar.get(i).getName(), "Myanmar Text", new Color(255, 255, 255, 0), Font.BOLD, 5, -7, data.song_array_sidebar.get(i).getName().length() * 10, 50, 13);
+                            overflowLabelTitle[i] = new Label(data.song_array_sidebar.get(i).getName(), "Myanmar Text", new Color(255,255,255,0), Font.BOLD, 5, -7, data.song_array_sidebar.get(i).getName().length() * 10, 50, 13);
                             overflowPanel[i].add(overflowLabelTitle[i]);
 
                             overflowLabelAuthor[i] = new Label(data.song_array_sidebar.get(i).getAuthor(), "Myanmar Text", new Color(255,255,255,0), Font.PLAIN, 5, 10, (data.song_array_sidebar.get(i).getName().length() + 2) * 6, 50, 12);
@@ -256,7 +259,6 @@ class SuperMain implements ActionListener{
                                 overflowPanel[index].setOpaque(false);
                                 overflowLabelTitle[index].setOpaque(false);
                                 overflowLabelAuthor[index].setOpaque(false);
-
                                 object[index].setAlpha(data.song_array_sidebar.get(index).getAlpha() - 50);
                             }
                         }
@@ -303,14 +305,15 @@ class SuperMain implements ActionListener{
     mainContentHolder.setPreferredSize(new Dimension(main_content_holder[0], main_content_holder[1]));
 
             subTopPanel = new Panel(Color.MAGENTA, sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3], new GridLayout(sub_top_panel[4],sub_top_panel[5],sub_top_panel[6],sub_top_panel[7]));
-
             // grid layout set on a 2x4 rowXcolumn with a set size
-                Panel[] playlist = new Panel[8];
 
+                playlistPanel = new Panel[8];
+                    titleText = new Label[8];
+
+                    
                 //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat parent container: supTopPanel.
-
                 for (int i = 0; i < 8; i++){
-                    playlist[i] = new Panel(new Color(110, 110, 110, 50), 0, 0, null, data.recently_clicked_non_artist.get(i).getImageAsRecentlyPlayed()){
+                    playlistPanel[i] = new Panel(transparent_gray, 0, 0, null, data.recently_clicked_non_artist.get(i).getImageAsRecentlyPlayed()){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -318,20 +321,20 @@ class SuperMain implements ActionListener{
                             int width = getWidth();
                             int height = getHeight();
                             Graphics2D g2d = (Graphics2D)g;
-                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
             
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
                             g2d.setClip(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), arcs.width, arcs.height));
+                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                             g2d.drawImage(getImageIcon().getImage(), 0, 0, getHeight()-1, getHeight()-1, null);
                         }
                     };
+                    playlistPanel[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    subTopPanel.add(playlistPanel[i]);  
 
 
-                    playlist[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    subTopPanel.add(playlist[i]);
                 }
                 mainContentHolder.add(subTopPanel);
 
@@ -431,8 +434,8 @@ class SuperMain implements ActionListener{
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], 240, side_bar_panel[7]);
-                scroll.revalidate();
-                scroll.repaint();
+                // scroll.revalidate();
+                // scroll.repaint();
                 for (int i = 0; i < data.song_array_sidebar.size(); i++){
                     object[i].setBounds(side_bar_button[0], 10 + (i * 55), 220, side_bar_button[2]);
                     object[i].setImage(data.song_array_sidebar.get(i).getImageCover().getImage());
@@ -441,27 +444,27 @@ class SuperMain implements ActionListener{
                     object[i].setImageWidth(data.song_array_sidebar.get(i).getImageWidthClicked());
                     object[i].setImageHeight(data.song_array_sidebar.get(i).getImageHeightClicked());
                     object[i].setAlpha(data.song_array_sidebar.get(i).getAlpha());
-
                     songTitle[i] = new Label(data.song_array_sidebar.get(i).getName(), "Myanmar Text", font_color, Font.BOLD, 10, 2, 220, 30, 13);
                     object[i].add(songTitle[i]);
                     songAuthor[i] = new Label(data.song_array_sidebar.get(i).getAuthor(), "Myanmar Text", font_color, Font.BOLD, 10, 20, 220, 30, 10);
                     object[i].add(songAuthor[i]);
-                    object[i].revalidate();
-                    object[i].repaint();
+                    // object[i].revalidate();
+                    // object[i].repaint();
                 }
 
                 libraryButton.setBounds(library_button[0], library_button[1], 220, library_button[3]);
                 contentPanel.setBounds(275, content_panel[1], 540, content_panel[3]);
-                contentPanel.revalidate();
-                contentPanel.repaint();
+                // contentPanel.revalidate();
+                // contentPanel.repaint();
+
                 subTopPanel.setBounds(sub_top_panel[0], sub_top_panel[1], 524, sub_top_panel[3]);
                 subTopPanel.revalidate();
                 subTopPanel.repaint();
                 for (int i = 0; i < listHolder.length; i++){
                     listHolder[i].setBounds(list_holder[0], list_holder[1], 524, list_holder[3]);
                     listHolder[i].setLayout(new GridLayout(list_holder[4], list_holder[5], 5, list_holder[7]));
-                    listHolder[i].revalidate();
-                    listHolder[i].repaint();
+                    // listHolder[i].revalidate();
+                    // listHolder[i].repaint();
                 }
             }
             else if (!library_is_toggled) {
@@ -470,8 +473,8 @@ class SuperMain implements ActionListener{
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
-                scroll.revalidate();
-                scroll.repaint();
+                // scroll.revalidate();
+                // scroll.repaint();
                 for (int i = 0; i < data.song_array_sidebar.size(); i++){
                     object[i].setBounds(side_bar_button[0], 10 + (i * 55), side_bar_button[1], side_bar_button[2]);
                     object[i].setImage(data.song_array_sidebar.get(i).getImageIcon().getImage());
@@ -482,22 +485,23 @@ class SuperMain implements ActionListener{
                     object[i].remove(songTitle[i]);
                     object[i].remove(songAuthor[i]);
                     object[i].setAlpha(0);
-                    object[i].revalidate();
-                    object[i].repaint();
+                    // object[i].revalidate();
+                    // object[i].repaint();
                 }
                 libraryButton.setBounds(library_button[0], library_button[1], library_button[2], library_button[3]);
 
                 contentPanel.setBounds(content_panel[0], content_panel[1], content_panel[2], content_panel[3]);
-                contentPanel.revalidate();
-                contentPanel.repaint();
+                // contentPanel.revalidate();
+                // contentPanel.repaint();
+
                 subTopPanel.setBounds(sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3]);
-                subTopPanel.revalidate();
-                subTopPanel.repaint();
+                // subTopPanel.revalidate();
+                // subTopPanel.repaint();
                 for (int i = 0; i < listHolder.length; i++){
                     listHolder[i].setBounds(list_holder[0], list_holder[1], list_holder[2], list_holder[3]);
                     listHolder[i].setLayout(new GridLayout(list_holder[4], list_holder[5], list_holder[6], list_holder[7]));
-                    listHolder[i].revalidate();
-                    listHolder[i].repaint();
+                    // listHolder[i].revalidate();
+                    // listHolder[i].repaint();
                 }
             }
         }
@@ -594,8 +598,11 @@ class Label extends JLabel{
         this.setFont(new Font(text_name, text_style, font_size));
     }
 
-    public void changeForeground(Color color){
+    Label(String text, String text_name, Color color, int text_style, int width, int height, int font_size){
+        this.setText(text);
+        this.setSize(width, height);
         this.setForeground(color);
+        this.setFont(new Font(text_name, text_style, font_size));
     }
 }
 
