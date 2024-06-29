@@ -1,6 +1,8 @@
-// customize the label inside subTopPanel so whenever the library button is toggled, it will resize the way you wanted it to be.
+//modifying the panels below subTopPanel, and organizing it.
 
 import java.awt.*;
+import java.awt.Panel;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -18,17 +20,19 @@ class SuperMain implements ActionListener{
             private Panel subPanel;
                 private Button libraryButton;
                     private Label libraryText;
+                    private Panel[] overflowPanel;
+                    private Label[] overflowLabelTitle;
+                    private Label[] overflowLabelAuthor;
                 private Button[] object;
                     private Panel overflowLibraryPanel;
                     private Label overflowLibraryText;
         private Panel contentPanel;
             private Panel subTopPanel;
-                Panel[] playlistPanel;
-                    Label[] titleText;
-            private Panel[] listHolder;
-            private Panel[] overflowPanel;
-            private Label[] overflowLabelTitle;
-            private Label[] overflowLabelAuthor;
+                private Panel[] playlistPanel;
+                    private Label[] titleText;
+                private Panel[] panelObject;
+                private Label[] mainTitle;
+                private Panel[] listHolder;
 
     // variables
     final int arc = 20;
@@ -313,7 +317,7 @@ class SuperMain implements ActionListener{
                     
                 //no need to put height and width to child component of a gridlayout because child component adapts its container size on a gridlayoutformat parent container: supTopPanel.
                 for (int i = 0; i < 8; i++){
-                    playlistPanel[i] = new Panel(transparent_gray, 0, 0, null, data.recently_clicked_non_artist.get(i).getImageAsRecentlyPlayed()){
+                    playlistPanel[i] = new Panel(transparent_gray, 0, 0, null, data.recently_clicked_non_artist.get(i).getImageAsRecentlyPlayed(50,50)){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -326,16 +330,14 @@ class SuperMain implements ActionListener{
                             g2d.setColor(getBackground());
                             g2d.setClip(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), arcs.width, arcs.height));
                             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            g2d.drawImage(getImageIcon().getImage(), 0, 0, getHeight()-1, getHeight()-1, null);
+                            g2d.drawImage(getImageIcon().getImage(), 0, 0, 50, 50, null);
                         }
                     };
                     playlistPanel[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subTopPanel.add(playlistPanel[i]);  
 
-                    int html_text_size = data.recently_clicked_non_artist.get(i).getHTMLText().length();
-                    titleText[i] = new Label(data.recently_clicked_non_artist.get(i).getHTMLText(), "Myanmar Text", font_color, Font.BOLD, 60, 7, html_text_size * 7, 30, 15);
+                    titleText[i] = new Label(data.recently_clicked_non_artist.get(i).getHTMLText(), "Myanmar Text", font_color, Font.BOLD, 60, -5, 290, 70, 15);
                     playlistPanel[i].add(titleText[i]);
 
                 }
@@ -351,10 +353,12 @@ class SuperMain implements ActionListener{
     
     
 
-    Panel[] panelObject = new Panel[4]; //4 outer panel that holds the mainTitle, listHolder, and picsHolder.
-    Label[] mainTitle = new Label[4]; //4 inner specific Title on each panelObject.
+    panelObject = new Panel[4]; //4 outer panel that holds the mainTitle, listHolder, and picsHolder.
+    mainTitle = new Label[4]; //4 inner specific Title on each panelObject.
     listHolder = new Panel[4]; //inner panel that holds the album together.
-    Panel[] picHolder = new Panel[4]; //album itself.
+    Panel[] albumHolder = new Panel[4]; //album itself.
+        Panel[] albumPictureHolder = new Panel[4]; // the picture holder inside the album
+        Panel[] albumTextHolder = new Panel[4]; // read the name dumbass
 
             for (int i = 0; i < panelObject.length; i++){
                 panelObject[i] = new Panel(Color.RED, panel_object[0], (130 + 130) + (i * 330), panel_object[1], panel_object[2], null);
@@ -369,8 +373,8 @@ class SuperMain implements ActionListener{
                 // listHolder[i].setOpaque(true);
                 panelObject[i].add(listHolder[i]);
 
-                for (int j = 0; j < picHolder.length; j++){
-                    picHolder[i] = new Panel(new Color(110, 110, 110, 50), pic_holder[0], pic_holder[1], null){
+                for (int j = 0; j < albumHolder.length; j++){
+                    albumHolder[i] = new Panel(new Color(110, 110, 110, 50), pic_holder[0], pic_holder[1], null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -385,8 +389,31 @@ class SuperMain implements ActionListener{
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                         }
                     };
-                    picHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    listHolder[i].add(picHolder[i]);
+
+                    albumHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    listHolder[i].add(albumHolder[i]);
+
+                    albumPictureHolder[i] = new Panel(Color.RED, 5, 5, 155, 150, null){
+                        @Override
+                        protected void paintComponent(Graphics g){
+                            super.paintComponent(g);
+                            Dimension arcs = new Dimension(pic_holder[2], pic_holder[3]);
+                            int width = getWidth();
+                            int height = getHeight();
+                            Graphics2D g2d = (Graphics2D)g;
+                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+                            //Draws the rounded opaque panel with borders
+                            g2d.setClip(new RoundRectangle2D.Float(0, 0, width, height, arcs.width, arcs.height));
+                            g2d.setColor(getBackground());
+                            g2d.fillRoundRect(0, 0, width, height, arcs.width, arcs.height);
+                        }
+                    };
+                    albumHolder[i].add(albumPictureHolder[i]);
+                    
+                    albumTextHolder[i] = new Panel(Color.BLUE, 5, albumPictureHolder[i].getHeight() + albumPictureHolder[i].getY() + 5, 155, 70, null);
+                    albumTextHolder[i].setOpaque(true);
+                    albumHolder[i].add(albumTextHolder[i]);
                 }
             };
     frame.setVisible(true);
@@ -460,6 +487,10 @@ class SuperMain implements ActionListener{
                 // contentPanel.revalidate();
                 // contentPanel.repaint();
 
+                for(int i = 0; i < 8; i++){
+                    titleText[i].setBounds(60, -5, 190, 70);
+                }
+
                 subTopPanel.setBounds(sub_top_panel[0], sub_top_panel[1], 524, sub_top_panel[3]);
                 subTopPanel.revalidate();
                 subTopPanel.repaint();
@@ -496,6 +527,10 @@ class SuperMain implements ActionListener{
                 contentPanel.setBounds(content_panel[0], content_panel[1], content_panel[2], content_panel[3]);
                 // contentPanel.revalidate();
                 // contentPanel.repaint();
+
+                for(int i = 0; i < 8; i++){
+                    titleText[i].setBounds(60, -5, 290, 70);
+                }
 
                 subTopPanel.setBounds(sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3]);
                 // subTopPanel.revalidate();
