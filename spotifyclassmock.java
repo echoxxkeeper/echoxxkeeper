@@ -1,7 +1,6 @@
-//modifying the panels below subTopPanel, and organizing it.
+// resize the image of the content panel properly to be fitted on the rounded clip panel...
 
 import java.awt.*;
-import java.awt.Panel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -33,6 +32,7 @@ class SuperMain implements ActionListener{
                 private Panel[] panelObject;
                 private Label[] mainTitle;
                 private Panel[] listHolder;
+                Panel[] albumHolder;
 
     // variables
     final int arc = 20;
@@ -356,11 +356,10 @@ class SuperMain implements ActionListener{
     panelObject = new Panel[4]; //4 outer panel that holds the mainTitle, listHolder, and picsHolder.
     mainTitle = new Label[4]; //4 inner specific Title on each panelObject.
     listHolder = new Panel[4]; //inner panel that holds the album together.
-    Panel[] albumHolder = new Panel[4]; //album itself.
-        Panel[] albumPictureHolder = new Panel[4]; // the picture holder inside the album
-        Panel[] albumTextHolder = new Panel[4]; // read the name dumbass
+    albumHolder = new Panel[4]; //album itself.
 
             for (int i = 0; i < panelObject.length; i++){
+                final int index = i;
                 panelObject[i] = new Panel(Color.RED, panel_object[0], (130 + 130) + (i * 330), panel_object[1], panel_object[2], null);
                 //posY 130 is the spacing between (4) panels and the added gap, 130 is the height of upper outer panel of the content, 210 is the total height of the first upper panel combined with existing (or not) spacing before and after it...    
                 // panelObject[i].setOpaque(true);
@@ -374,6 +373,7 @@ class SuperMain implements ActionListener{
                 panelObject[i].add(listHolder[i]);
 
                 for (int j = 0; j < albumHolder.length; j++){
+                    final int index_j = j;
                     albumHolder[i] = new Panel(new Color(110, 110, 110, 50), pic_holder[0], pic_holder[1], null){
                         @Override
                         protected void paintComponent(Graphics g){
@@ -383,37 +383,23 @@ class SuperMain implements ActionListener{
                             int height = getHeight();
                             Graphics2D g2d = (Graphics2D)g;
                             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
             
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
+                            g2d.setClip(new RoundRectangle2D.Float(0, 0, width-1, height-1, arcs.width, arcs.height));
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                            g2d.setClip(new RoundRectangle2D.Float(10, 10, width -20, width -20, arcs.width, arcs.height));
+                            // g2d.setColor(Color.RED);
+                            // g2d.fillRoundRect(0, 0, width -1, height -1, arcs.width, arcs.height);
+                            g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 140, 140, null);
+                            g2d.setClip(new Rectangle(5, width, (width -1) -10, 60));
+                            g2d.setColor(Color.BLUE);
+                            g2d.fillRect(5, width, width - 1, height);
                         }
                     };
-
                     albumHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     listHolder[i].add(albumHolder[i]);
-
-                    albumPictureHolder[i] = new Panel(Color.RED, 5, 5, 155, 150, null){
-                        @Override
-                        protected void paintComponent(Graphics g){
-                            super.paintComponent(g);
-                            Dimension arcs = new Dimension(pic_holder[2], pic_holder[3]);
-                            int width = getWidth();
-                            int height = getHeight();
-                            Graphics2D g2d = (Graphics2D)g;
-                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
-                            //Draws the rounded opaque panel with borders
-                            g2d.setClip(new RoundRectangle2D.Float(0, 0, width, height, arcs.width, arcs.height));
-                            g2d.setColor(getBackground());
-                            g2d.fillRoundRect(0, 0, width, height, arcs.width, arcs.height);
-                        }
-                    };
-                    albumHolder[i].add(albumPictureHolder[i]);
-                    
-                    albumTextHolder[i] = new Panel(Color.BLUE, 5, albumPictureHolder[i].getHeight() + albumPictureHolder[i].getY() + 5, 155, 70, null);
-                    albumTextHolder[i].setOpaque(true);
-                    albumHolder[i].add(albumTextHolder[i]);
                 }
             };
     frame.setVisible(true);
@@ -464,8 +450,6 @@ class SuperMain implements ActionListener{
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], 240, side_bar_panel[7]);
-                // scroll.revalidate();
-                // scroll.repaint();
                 for (int i = 0; i < data.song_array_sidebar.size(); i++){
                     object[i].setBounds(side_bar_button[0], 10 + (i * 55), 220, side_bar_button[2]);
                     object[i].setImage(data.song_array_sidebar.get(i).getImageCover().getImage());
@@ -478,14 +462,10 @@ class SuperMain implements ActionListener{
                     object[i].add(songTitle[i]);
                     songAuthor[i] = new Label(data.song_array_sidebar.get(i).getAuthor(), "Myanmar Text", font_color, Font.BOLD, 10, 20, 220, 30, 10);
                     object[i].add(songAuthor[i]);
-                    // object[i].revalidate();
-                    // object[i].repaint();
                 }
 
                 libraryButton.setBounds(library_button[0], library_button[1], 220, library_button[3]);
                 contentPanel.setBounds(275, content_panel[1], 540, content_panel[3]);
-                // contentPanel.revalidate();
-                // contentPanel.repaint();
 
                 for(int i = 0; i < 8; i++){
                     titleText[i].setBounds(60, -5, 190, 70);
@@ -497,9 +477,8 @@ class SuperMain implements ActionListener{
                 for (int i = 0; i < listHolder.length; i++){
                     listHolder[i].setBounds(list_holder[0], list_holder[1], 524, list_holder[3]);
                     listHolder[i].setLayout(new GridLayout(list_holder[4], list_holder[5], 5, list_holder[7]));
-                    // listHolder[i].revalidate();
-                    // listHolder[i].repaint();
                 }
+
             }
             else if (!library_is_toggled) {
                 
@@ -507,8 +486,6 @@ class SuperMain implements ActionListener{
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
                 scroll.setBounds(side_bar_panel[4], side_bar_panel[5], side_bar_panel[6], side_bar_panel[7]);
-                // scroll.revalidate();
-                // scroll.repaint();
                 for (int i = 0; i < data.song_array_sidebar.size(); i++){
                     object[i].setBounds(side_bar_button[0], 10 + (i * 55), side_bar_button[1], side_bar_button[2]);
                     object[i].setImage(data.song_array_sidebar.get(i).getImageIcon().getImage());
@@ -519,28 +496,20 @@ class SuperMain implements ActionListener{
                     object[i].remove(songTitle[i]);
                     object[i].remove(songAuthor[i]);
                     object[i].setAlpha(0);
-                    // object[i].revalidate();
-                    // object[i].repaint();
                 }
                 libraryButton.setBounds(library_button[0], library_button[1], library_button[2], library_button[3]);
-
                 contentPanel.setBounds(content_panel[0], content_panel[1], content_panel[2], content_panel[3]);
-                // contentPanel.revalidate();
-                // contentPanel.repaint();
 
                 for(int i = 0; i < 8; i++){
                     titleText[i].setBounds(60, -5, 290, 70);
                 }
 
                 subTopPanel.setBounds(sub_top_panel[0], sub_top_panel[1], sub_top_panel[2], sub_top_panel[3]);
-                // subTopPanel.revalidate();
-                // subTopPanel.repaint();
                 for (int i = 0; i < listHolder.length; i++){
                     listHolder[i].setBounds(list_holder[0], list_holder[1], list_holder[2], list_holder[3]);
                     listHolder[i].setLayout(new GridLayout(list_holder[4], list_holder[5], list_holder[6], list_holder[7]));
-                    // listHolder[i].revalidate();
-                    // listHolder[i].repaint();
                 }
+
             }
         }
     }
