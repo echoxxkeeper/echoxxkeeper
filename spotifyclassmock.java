@@ -1,18 +1,14 @@
-// resize the image of the content panel properly to be fitted on the rounded clip panel...
-
+// fix the hovering bug!!!
 import java.awt.*;
-
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
+import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
 
+class SuperMain implements ActionListener {
 
-class SuperMain implements ActionListener{
-
-    static Data data = new Data();
+    private static Data data = new Data();
     private Frame frame;
         private Panel sidebarPanel;
             private JScrollPane scroll;
@@ -35,11 +31,12 @@ class SuperMain implements ActionListener{
                 Panel[] albumHolder;
 
     // variables
-    final int arc = 20;
-    final Color font_color = new Color(255,255,255);
-    final Color dark_gray = new Color(18, 18, 18);
-    final Color transparent_gray = new Color(110, 110, 110, 50);
-    public Boolean library_is_toggled = false;
+    // public Boolean library_is_toggled = false;
+    public Boolean is_library_toggled = false;
+    private final int arc = 20;
+    private final Color font_color = new Color(255,255,255);
+    private final Color dark_gray = new Color(18, 18, 18);
+    private final Color transparent_gray = new Color(110, 110, 110, 50);
     private int scroll_y_pos;
     private int sidebar_button_view_y_pos;
 
@@ -251,7 +248,7 @@ class SuperMain implements ActionListener{
                     final int index = i;
                     object[i].addMouseListener(new MouseListener() {
                         public void mouseEntered(MouseEvent e){
-                            if(!library_is_toggled){
+                            if(!is_library_toggled){
                             overflowPanel[index].setBounds(95, scroll_y_pos + object[index].getY() - sidebar_button_view_y_pos, (data.song_array_sidebar.get(index).getName().length() + 5) * 6, 50);
                             overflowPanel[index].setBackground(new Color(110, 110, 110, 255));
                             overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 255));
@@ -267,7 +264,7 @@ class SuperMain implements ActionListener{
                             }
                         }
                         public void mouseExited(MouseEvent e){
-                            if (!library_is_toggled){
+                            if (!is_library_toggled){
                                 overflowPanel[index].setBackground(new Color(110, 110, 110, 0));
                                 overflowLabelTitle[index].setForeground(new Color(255, 255, 255, 0));
                                 overflowLabelAuthor[index].setForeground(new Color(255, 255, 255, 0));
@@ -337,7 +334,7 @@ class SuperMain implements ActionListener{
                     playlistPanel[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     subTopPanel.add(playlistPanel[i]);  
 
-                    titleText[i] = new Label(data.recently_clicked_non_artist.get(i).getHTMLText(), "Myanmar Text", font_color, Font.BOLD, 60, -5, 290, 70, 15);
+                    titleText[i] = new Label(data.recently_clicked_non_artist.get(i).getHTMLTextAsSongName(), "Myanmar Text", font_color, Font.BOLD, 60, -5, 290, 70, 15);
                     playlistPanel[i].add(titleText[i]);
 
                 }
@@ -358,6 +355,8 @@ class SuperMain implements ActionListener{
     listHolder = new Panel[4]; //inner panel that holds the album together.
     albumHolder = new Panel[4]; //album itself.
 
+
+
             for (int i = 0; i < panelObject.length; i++){
                 final int index = i;
                 panelObject[i] = new Panel(Color.RED, panel_object[0], (130 + 130) + (i * 330), panel_object[1], panel_object[2], null);
@@ -372,9 +371,9 @@ class SuperMain implements ActionListener{
                 // listHolder[i].setOpaque(true);
                 panelObject[i].add(listHolder[i]);
 
-                for (int j = 0; j < albumHolder.length; j++){
+                for (int j = 0; j < listHolder.length; j++){
                     final int index_j = j;
-                    albumHolder[i] = new Panel(new Color(110, 110, 110, 50), pic_holder[0], pic_holder[1], null){
+                    albumHolder[j] = new Panel(new Color(110, 110, 110, 0), pic_holder[0], pic_holder[1], null){
                         @Override
                         protected void paintComponent(Graphics g){
                             super.paintComponent(g);
@@ -384,22 +383,68 @@ class SuperMain implements ActionListener{
                             Graphics2D g2d = (Graphics2D)g;
                             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             
                             //Draws the rounded opaque panel with borders
                             g2d.setColor(getBackground());
                             g2d.setClip(new RoundRectangle2D.Float(0, 0, width-1, height-1, arcs.width, arcs.height));
                             g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
                             g2d.setClip(new RoundRectangle2D.Float(10, 10, width -20, width -20, arcs.width, arcs.height));
-                            // g2d.setColor(Color.RED);
-                            // g2d.fillRoundRect(0, 0, width -1, height -1, arcs.width, arcs.height);
-                            g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 140, 140, null);
-                            g2d.setClip(new Rectangle(5, width, (width -1) -10, 60));
-                            g2d.setColor(Color.BLUE);
-                            g2d.fillRect(5, width, width - 1, height);
+
+                            if (!is_library_toggled){
+                                if (data.getSong(index, index_j).isArtist()){
+                                    g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 140, 140, null);
+                                }
+                                else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 5, 0, 160, 160, null);}
+                            }
+                            else {
+                                if (data.getSong(index, index_j).isArtist()){
+                                    g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 105, 105, null);
+                                }
+                                else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 0, 0, 125, 125, null);}
+                            }
+
+                            
+                            if (is_library_toggled){
+                                g2d.setClip(new Rectangle(5, width, (width -1) -10, 100));
+                                    // g2d.setColor(Color.BLUE);
+                                    // g2d.fillRect(0, 0, 400, 400);
+                                g2d.setColor(font_color);
+                                //Title
+                                g2d.setFont(new Font("Myanmar Text", Font.BOLD, 20));
+                                g2d.drawString(data.getSong(index, index_j).getName(), 7, 145);
+                                //Author Name
+                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 15));
+                                g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 170);
+                                //Song Bio
+                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
+                                g2d.drawString(data.getSong(index, index_j).getBio(), 7, 205);
+                            } 
+                            else {
+                                g2d.setClip(new Rectangle(5, width, (width -1) -10, 60));
+                                    // g2d.setColor(Color.BLUE);
+                                    // g2d.fillRect(0, 0, 400, 400);
+                                g2d.setColor(font_color);
+                                //Title
+                                g2d.setFont(new Font("Myanmar Text", Font.BOLD, 15));
+                                g2d.drawString(data.getSong(index, index_j).getName(), 7, 180);
+                                //Author Name
+                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
+                                g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 200);
+                                //Song Bio
+                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 11));
+                                g2d.drawString(data.getSong(index, index_j).getBio(), 7, 217);
+                            }
                         }
                     };
-                    albumHolder[i].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    listHolder[i].add(albumHolder[i]);
+                    albumHolder[j].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    albumHolder[j].addMouseListener(new MouseListener() {
+                       @Override
+                       public void mouseEntered(MouseEvent e){
+                        // System.out.println("Album: " + index_j + " has been hovered!");
+                       } 
+                    });
+                    listHolder[i].add(albumHolder[j]);
                 }
             };
     frame.setVisible(true);
@@ -419,7 +464,7 @@ class SuperMain implements ActionListener{
         }
         public void mouseEntered(MouseEvent e){
             if (e.getSource() == libraryButton){
-                if (library_is_toggled){}
+                if (is_library_toggled){}
                 else{
                     overflowLibraryPanel.setBounds(95, sidebarPanel.getY() + libraryButton.getY(), data.getTitle(4).length() * 8, 50);
                     overflowLibraryPanel.setBackground(new Color(110,110,110,255));
@@ -429,7 +474,7 @@ class SuperMain implements ActionListener{
         }
         public void mouseExited(MouseEvent e){
             if (e.getSource() == libraryButton){
-                if (library_is_toggled){}
+                if (is_library_toggled){}
                 else{
                     overflowLibraryPanel.setBackground(new Color(110,110,110, 0));
                     overflowLibraryText.setForeground(new Color(255,255,255,0));
@@ -444,8 +489,8 @@ class SuperMain implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == libraryButton){
-            library_is_toggled = !library_is_toggled;
-            if (library_is_toggled){
+            is_library_toggled = !is_library_toggled;
+            if (is_library_toggled){
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], 255, side_bar_panel[3]);
                 sidebarPanel.revalidate();
                 sidebarPanel.repaint();
@@ -480,7 +525,7 @@ class SuperMain implements ActionListener{
                 }
 
             }
-            else if (!library_is_toggled) {
+            else if (!is_library_toggled) {
                 
                 sidebarPanel.setBounds(side_bar_panel[0], side_bar_panel[1], side_bar_panel[2], side_bar_panel[3]);
                 sidebarPanel.revalidate();
@@ -513,6 +558,12 @@ class SuperMain implements ActionListener{
             }
         }
     }
+
+// getter
+
+Boolean isLibraryButtonToggled(){
+    return is_library_toggled;
+}
 
 }
 
