@@ -1,4 +1,4 @@
-// fix the hovering bug!!!
+// make the hovering effect a rounded panel
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -28,7 +28,7 @@ class SuperMain implements ActionListener {
                 private Panel[] panelObject;
                 private Label[] mainTitle;
                 private Panel[] listHolder;
-                Panel[] albumHolder;
+                ArrayList<Panel> albumHolder;
 
     // variables
     // public Boolean library_is_toggled = false;
@@ -353,9 +353,7 @@ class SuperMain implements ActionListener {
     panelObject = new Panel[4]; //4 outer panel that holds the mainTitle, listHolder, and picsHolder.
     mainTitle = new Label[4]; //4 inner specific Title on each panelObject.
     listHolder = new Panel[4]; //inner panel that holds the album together.
-    albumHolder = new Panel[4]; //album itself.
-
-
+    ArrayList<Panel> albumHolder = new ArrayList<>();
 
             for (int i = 0; i < panelObject.length; i++){
                 final int index = i;
@@ -367,86 +365,95 @@ class SuperMain implements ActionListener {
                 mainTitle[i] = new Label(data.getTitle(i), "Myanmar Text", font_color, Font.BOLD, main_title[0], main_title[1], main_title[2], main_title[3], main_title[4]);
                 panelObject[i].add(mainTitle[i]);
 
-                listHolder[i] = new Panel(Color.BLUE, list_holder[0], list_holder[1], list_holder[2], list_holder[3], new GridLayout(list_holder[4], list_holder[5], list_holder[6] , list_holder[7]));
+                listHolder[i] = new Panel(new Color(110,110,110), list_holder[0], list_holder[1], list_holder[2], list_holder[3], new GridLayout(list_holder[4], list_holder[5], list_holder[6] , list_holder[7]));
                 // listHolder[i].setOpaque(true);
                 panelObject[i].add(listHolder[i]);
 
                 for (int j = 0; j < listHolder.length; j++){
                     final int index_j = j;
-                    albumHolder[j] = new Panel(new Color(110, 110, 110, 0), pic_holder[0], pic_holder[1], null){
-                        @Override
-                        protected void paintComponent(Graphics g){
-                            super.paintComponent(g);
-                            Dimension arcs = new Dimension(pic_holder[2], pic_holder[3]);
-                            int width = getWidth();
-                            int height = getHeight();
-                            Graphics2D g2d = (Graphics2D)g;
-                            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            
-                            //Draws the rounded opaque panel with borders
-                            g2d.setColor(getBackground());
-                            g2d.setClip(new RoundRectangle2D.Float(0, 0, width-1, height-1, arcs.width, arcs.height));
-                            g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
-                            g2d.setClip(new RoundRectangle2D.Float(10, 10, width -20, width -20, arcs.width, arcs.height));
-
-                            if (!is_library_toggled){
-                                if (data.getSong(index, index_j).isArtist()){
-                                    g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 140, 140, null);
+                    albumHolder.add(j, new Panel(dark_gray, pic_holder[0], pic_holder[1], null){
+                                @Override
+                                protected void paintComponent(Graphics g){
+                                    super.paintComponent(g);
+                                    Dimension arcs = new Dimension(pic_holder[2], pic_holder[3]);
+                                    int width = getWidth();
+                                    int height = getHeight();
+                                    Graphics2D g2d = (Graphics2D)g;
+                                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                                    g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    
+                                    //Draws the rounded opaque panel with borders
+                                    g2d.setColor(getBackground());
+                                    g2d.setClip(new RoundRectangle2D.Float(0, 0, width-1, height-1, arcs.width, arcs.height));
+                                    g2d.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);
+                                    g2d.setClip(new RoundRectangle2D.Float(10, 10, width -20, width -20, arcs.width, arcs.height));
+        
+                                    if (!is_library_toggled){
+                                        if (data.getSong(index, index_j).isArtist()){
+                                            g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 140, 140, null);
+                                        }
+                                        else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 5, 0, 160, 160, null);}
+                                    }
+                                    else {
+                                        if (data.getSong(index, index_j).isArtist()){
+                                            g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 105, 105, null);
+                                        }
+                                        else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 0, 0, 125, 125, null);}
+                                    }
+        
+                                    
+                                    if (is_library_toggled){
+                                        g2d.setClip(new Rectangle(5, width, (width -1) -10, 100));
+                                            // g2d.setColor(Color.BLUE);
+                                            // g2d.fillRect(0, 0, 400, 400);
+                                        g2d.setColor(font_color);
+                                        //Title
+                                        g2d.setFont(new Font("Myanmar Text", Font.BOLD, 20));
+                                        g2d.drawString(data.getSong(index, index_j).getName(), 7, 145);
+                                        //Author Name
+                                        g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 15));
+                                        g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 170);
+                                        //Song Bio
+                                        g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
+                                        g2d.drawString(data.getSong(index, index_j).getBio(), 7, 205);
+                                    } 
+                                    else {
+                                        g2d.setClip(new Rectangle(5, width, (width -1) -10, 60));
+                                            // g2d.setColor(Color.BLUE);
+                                            // g2d.fillRect(0, 0, 400, 400);
+                                        g2d.setColor(font_color);
+                                        //Title
+                                        g2d.setFont(new Font("Myanmar Text", Font.BOLD, 15));
+                                        g2d.drawString(data.getSong(index, index_j).getName(), 7, 180);
+                                        //Author Name
+                                        g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
+                                        g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 200);
+                                        //Song Bio
+                                        g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 11));
+                                        g2d.drawString(data.getSong(index, index_j).getBio(), 7, 217);
+                                    }
                                 }
-                                else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 5, 0, 160, 160, null);}
-                            }
-                            else {
-                                if (data.getSong(index, index_j).isArtist()){
-                                    g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 10, 10, 105, 105, null);
-                                }
-                                else {g2d.drawImage(data.supplyImageToContentPanel(index, index_j), 0, 0, 125, 125, null);}
-                            }
-
-                            
-                            if (is_library_toggled){
-                                g2d.setClip(new Rectangle(5, width, (width -1) -10, 100));
-                                    // g2d.setColor(Color.BLUE);
-                                    // g2d.fillRect(0, 0, 400, 400);
-                                g2d.setColor(font_color);
-                                //Title
-                                g2d.setFont(new Font("Myanmar Text", Font.BOLD, 20));
-                                g2d.drawString(data.getSong(index, index_j).getName(), 7, 145);
-                                //Author Name
-                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 15));
-                                g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 170);
-                                //Song Bio
-                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
-                                g2d.drawString(data.getSong(index, index_j).getBio(), 7, 205);
-                            } 
-                            else {
-                                g2d.setClip(new Rectangle(5, width, (width -1) -10, 60));
-                                    // g2d.setColor(Color.BLUE);
-                                    // g2d.fillRect(0, 0, 400, 400);
-                                g2d.setColor(font_color);
-                                //Title
-                                g2d.setFont(new Font("Myanmar Text", Font.BOLD, 15));
-                                g2d.drawString(data.getSong(index, index_j).getName(), 7, 180);
-                                //Author Name
-                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 13));
-                                g2d.drawString(data.getSong(index, index_j).getAuthor(), 7, 200);
-                                //Song Bio
-                                g2d.setFont(new Font("Myanmar Text", Font.PLAIN, 11));
-                                g2d.drawString(data.getSong(index, index_j).getBio(), 7, 217);
-                            }
-                        }
-                    };
-                    albumHolder[j].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    albumHolder[j].addMouseListener(new MouseListener() {
-                       @Override
-                       public void mouseEntered(MouseEvent e){
-                        // System.out.println("Album: " + index_j + " has been hovered!");
-                       } 
-                    });
-                    listHolder[i].add(albumHolder[j]);
+                            });
+                    albumHolder.get(j).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    albumHolder.get(j).setOpaque(true);
+                    listHolder[i].add(albumHolder.get(j));
                 }
             };
+
+        for (int i = 0; i < albumHolder.size(); i++){
+            final int index = i;
+            albumHolder.get(index).addMouseListener(new MouseListener() {
+                @Override
+                public void mouseEntered(MouseEvent e){
+                    albumHolder.get(index).setBackground(new Color(110,110,110));
+                }
+                @Override
+                public void mouseExited(MouseEvent e){
+                    albumHolder.get(index).setBackground(dark_gray);
+                }
+            });
+        }
     frame.setVisible(true);
     }
 
